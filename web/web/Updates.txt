@@ -1,0 +1,45 @@
+/* Web Updates
+ * LINE
+ * LINE
+ * LINE
+ * Saqirmdev <saqirmdev@myendras.com> 
+*/
+
++ <a href='vp.php?id=5' />Akcia do 16.10.2012 (80lv)</a><br />";
+
++                       elseif($_GET['id'] == 5)
++                       {        
++                           mysql_select_db($characters);                  
++                      echo "Do 15.10.2012<br />
++                            You must be offline<br />";
++                      $char_sel_q = mysql_query("SELECT * FROM characters WHERE account='".$_SESSION['playerID']."' AND level<80");
++                      echo "<form method='POST'>";
++                      echo "<select name='character'>";
++                      
++                      while($char_sel = mysql_fetch_array($char_sel_q))
++                      {
++                        echo ("<option value='".$char_sel['guid']."'>".$char_sel['name']." (".$char_sel['level']."Level)</option>");
++                      }
++                      echo "</select><br /><input type='submit' value='GetLevel'></form>";
++                      
++
++                      if(empty($_POST))
++                      {}
++                      else
++                      {
++                        mysql_real_escape_string($_POST['character']);
++                        $overeni_online_sql = "SELECT * FROM characters WHERE guid='".$_POST['character']."'";
++                        $overeni_online_q = mysql_query($overeni_online_sql);
++                        $overeni_online = mysql_fetch_array($overeni_online_q);
++                        if($overeni_online == 1)
++                        {
++                          echo "Musite byt offline!";
++                        }
++                        else
++                        {
++                      $update_char_sql = mysql_query("UPDATE characters SET `money`=`money`+20000000, `level`=80 WHERE guid='".$_POST['character']."'");
++                       mysql_select_db($webdb);
++                          echo "You now have +2000Gold and 80lv";
++                        }
++                      }
++                      }

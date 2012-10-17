@@ -1568,6 +1568,8 @@ void GameObject::Use(Unit* user)
             if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
+		    Player* player = user->ToPlayer();
+				
             if (player->CanUseBattlegroundObject(this))
 
             if (player->CanUseBattlegroundObject())

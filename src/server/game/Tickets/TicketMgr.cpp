@@ -44,10 +44,9 @@ GmTicket::GmTicket(Player* player, WorldPacket& recvData) : _createTime(time(NUL
     recvData >> _posX;
     recvData >> _posY;
     recvData >> _posZ;
-    recvData >> _message;sage;
+    recvData >> _message;
     uint32 needResponse;
     recvData >> needResponse;
- 	 50	
     _needResponse = (needResponse == 17);   // Requires GM response. 17 = true, 1 = false (17 is default)
     recvData >> _haveTicket;                // Requests further GM interaction on a ticket to which a GM has already responded. Basically means "has a new ticket"
 }

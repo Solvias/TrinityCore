@@ -3193,15 +3193,8 @@ void Spell::cancel()
 
 void Spell::cast(bool skipCheck)
 {
-    //Check Unit_State
-	if (_spell->Id == 36554) //Shadowstep
-		if (m_caster->HasUnitState(UNIT_STATE_ROOT))
-			return SPELL_FAILED_ROOTED;
-				  
-	if (_spell->Id == 45334) //Feral Charge
-		if (m_caster->HasUnitState(UNIT_STATE_ROOT))
-			return SPELL_FAILED_ROOTED;
-		
+
+	
     // update pointers base at GUIDs to prevent access to non-existed already object
     UpdatePointers();
 
@@ -5753,6 +5746,7 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
             return delayForInstantSpells;
 
     return 0;
+
 }
 
 

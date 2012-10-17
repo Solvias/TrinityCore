@@ -1230,3 +1230,53 @@ INSERT INTO `creature_involvedrelation` (`id`, `quest`) VALUES
 DELETE FROM `creature_questrelation` WHERE `quest` IN (11431);
 INSERT INTO `creature_questrelation` (`id`, `quest`) VALUES
 (24657, 11431);
+
+SET @GUID := xxxx; -- Set by TDB team (4)
+SET @POOL := xxxx; -- Set by TDB team (1)
+
+DELETE FROM `gameobject` WHERE `id`=202083;
+INSERT INTO `gameobject` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`position_x`,`position_y`,`position_z`,`orientation`,`rotation0`,`rotation1`,`rotation2`,`rotation3`,`spawntimesecs`,`animprogress`,`state`) VALUES
+-- http://pastebin.com/bhr50Ypv , https://www.youtube.com/watch?v=c1Dz_-ycIuU#t=160s
+(@GUID+0, 202083, 0, 1, 1, -2944.07, -3276.32, 62.2180, 3.32798, 0, 0, 0.995661, -0.093059, 18000, 100, 1),
+-- https://www.youtube.com/watch?v=c1Dz_-ycIuU#t=124s
+(@GUID+1, 202083, 0, 1, 1, -3000.93, -3329.01, 64.9771, 4.10851, 0, 0, 0.885393, -0.464843, 18000, 100, 1),
+-- https://www.youtube.com/watch?v=yWSvwdNHspY#t=30s , https://www.youtube.com/watch?v=c1Dz_-ycIuU#t=95s
+(@GUID+2, 202083, 0, 1, 1, -3020.76, -3245.81, 58.8009, 5.38478, 0, 0, 0.434249, -0.900793, 18000, 100, 1),
+-- https://www.youtube.com/watch?v=f0rCteF0Ras#t=200s , https://www.youtube.com/watch?v=yWSvwdNHspY#t=30s
+(@GUID+3, 202083, 0, 1, 1, -2992.36, -3188.19, 55.1982, 3.01524, 0, 0, 0.998005, 0.0631367, 18000, 100, 1);
+
+DELETE FROM `pool_template` WHERE `entry`=@POOL;
+INSERT INTO `pool_template` (`entry`,`max_limit`,`description`) VALUES
+(@POOL,1,"Razormaw Matriarch's Nest (202083)");
+
+DELETE FROM `pool_gameobject` WHERE `guid` IN (@GUID+0,@GUID+1,@GUID+2,@GUID+3);
+INSERT INTO `pool_gameobject` (`guid`,`pool_entry`,`chance`,`description`) VALUES
+(@GUID+0,@POOL,25,"Razormaw Matriarch's Nest (202083) P1"),
+(@GUID+1,@POOL,25,"Razormaw Matriarch's Nest (202083) P2"),
+(@GUID+2,@POOL,25,"Razormaw Matriarch's Nest (202083) P3"),
+(@GUID+3,@POOL,25,"Razormaw Matriarch's Nest (202083) P4");
+
+-- Twilight of the Dawn Runner (9437) quest fix by nelegalno
+UPDATE `smart_scripts` SET `event_type`=62, `event_param1`=7371, `comment`='Ithania - On gossip select - run timed action list' WHERE (`entryorguid`=17119 AND `source_type`=0 AND `id`=0);
+UPDATE `creature_template` SET `gossip_menu_id` = 7371 WHERE `entry` = 17119;
+
+DELETE FROM `gossip_menu` WHERE `entry`=7371 AND `text_id`=8808;
+INSERT INTO `gossip_menu` (`entry`, `text_id`) VALUES(7371,8808);
+
+DELETE FROM `gossip_menu_option` WHERE `menu_id`=7371 AND `id`=0;
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `box_coded`, `box_money`, `box_text`) VALUES
+(7371,0,0,'Balandar sent me to get you out of here and pick up his cargo. He is waiting for you in the Brackenwall.',1,1,0,0,0,0,NULL);
+
+DELETE FROM `spell_proc_event` WHERE `entry` IN (71865,71868);
+INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES
+(71865, 0, 0, 0, 0, 0, 0x44000, 0, 0, 0, 0),
+(71868, 0, 0, 0, 0, 0, 0x44000, 0, 0, 0, 0);
+
+- Definitions
+SET @QUEST1 := 7581; -- The Prison's Bindings (http://old.wowhead.com/quest=7581)
+SET @QUEST2 := 7582; -- The Prison's Casing (http://old.wowhead.com/quest=7582)
+SET @QUEST3 := 7583; -- Suppression (http://old.wowhead.com/quest=7583)
+-- Query
+UPDATE `quest_template` SET `NextQuestIdChain`=@QUEST2 WHERE `Id`=@QUEST1;
+UPDATE `quest_template` SET `PrevQuestId`=@QUEST1, `NextQuestIdChain`=@QUEST3 WHERE `Id`=@QUEST2;
+UPDATE `quest_template` SET `PrevQuestId`=@QUEST2 WHERE `Id`=@QUEST3;

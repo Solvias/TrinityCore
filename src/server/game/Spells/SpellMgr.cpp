@@ -3030,12 +3030,6 @@ void SpellMgr::LoadDbcDataCorrections()
 
         switch (spellInfo->Id)
         {
-//SAQIRMDEV FIXEs
-            case 50622:  // BlADESTORM Trigger10890
-            spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_7_YARDS;
-            spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_7_YARDS;
-            spellInfo->speed = 70;
-            break;
             case 10890:  // Psychic Scream
             spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS;
             spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_10_YARDS;
@@ -3046,11 +3040,6 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_8_YARDS;
             spellInfo->speed = 80;
             break;
-            case 24259: // Spell Lock
-                 spellInfo->speed = 20;
-                 break;
-
-//SAQIRMDEV FIXES
             case 42730:
                 spellInfo->EffectTriggerSpell[EFFECT_1] = 42739;
                 break;

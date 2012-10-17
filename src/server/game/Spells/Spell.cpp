@@ -3193,6 +3193,15 @@ void Spell::cancel()
 
 void Spell::cast(bool skipCheck)
 {
+    //Check Unit_State
+	if (_spell->Id == 36554) //Shadowstep
+		if (m_caster->HasUnitState(UNIT_STATE_ROOT))
+			return SPELL_FAILED_ROOTED;
+				  
+	if (_spell->Id == 45334) //Feral Charge
+		if (m_caster->HasUnitState(UNIT_STATE_ROOT))
+			return SPELL_FAILED_ROOTED;
+		
     // update pointers base at GUIDs to prevent access to non-existed already object
     UpdatePointers();
 
@@ -5285,7 +5294,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_spellInfo->Id != 1842 || (m_targets.GetGOTarget() &&
                     m_targets.GetGOTarget()->GetGOInfo()->type != GAMEOBJECT_TYPE_TRAP))
                     if (m_caster->ToPlayer()->InBattleground() && // In Battleground players can use only flags and banners
-                        !m_caster->ToPlayer()->CanUseBattlegroundObject())
+                        !m_caster->ToPlayer()->CanUseBattlegroundObject(m_targets.GetGOTarget()))
                         return SPELL_FAILED_TRY_AGAIN;
 
                 // get the lock entry
@@ -5646,15 +5655,15 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
 {
     //Saqirmdev -- Fixes
     AuraType auraWithCCD[] = {
-        SPELL_AURA_MOD_STUN,
+		SPELL_AURA_MOD_STUN,
 		SPELL_AURA_MOD_SILENCE,
-        SPELL_AURA_MOD_CONFUSE,
-        SPELL_AURA_MOD_FEAR,
-        SPELL_AURA_MOD_DISARM,
-        SPELL_AURA_MOD_ROOT,
-        SPELL_AURA_MOD_POSSESS
-    };
-    uint8 CCDArraySize = 7;
+		SPELL_AURA_MOD_CONFUSE,
+		SPELL_AURA_MOD_FEAR,
+		SPELL_AURA_MOD_DISARM,
+		SPELL_AURA_MOD_ROOT,
+		SPELL_AURA_MOD_POSSESS
+	};
+	uint8 CCDArraySize = 7;
 
     const uint32 delayForInstantSpells = 126;
     const uint32 delayForInstantSpells2 = 50;
@@ -5662,18 +5671,13 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
     const uint32 delayForInstantSpells4 = 230;
     const uint32 NOdelayForInstantSpells = 0;
 
-
-
-
-
-
     switch(_spell->SpellFamilyName)
     {
         case SPELLFAMILY_HUNTER:
             // Traps
             if (_spell->SpellFamilyFlags[0] & 0x8 ||      // Frozen trap
-                _spell->Id == 57879 ||                    // Snake Trap
-                _spell->SpellFamilyFlags[2] & 0x00024000) // Explosive and Immolation Trap+
+				_spell->Id == 57879 ||                    // Snake Trap
+                _spell->SpellFamilyFlags[2] & 0x00024000) // Explosive and Immolation Trap
                 return 0;
 
             // Entrapment
@@ -5684,7 +5688,7 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
             // Death Grip
             if (_spell->Id == 49576)
                 return NOdelayForInstantSpells;
-            break;
+				break;
         case SPELLFAMILY_ROGUE:
             // Blind
             if (_spell->Id == 2094)
@@ -5700,12 +5704,12 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
             // HEX
             if (_spell->Id == 51514)
                 return delayForInstantSpells3;
-            break;
+			break;
         case SPELLFAMILY_MAGE:
-            // POLYMORPH
+            // Polymorph
             if (_spell->Id == 12826)
                 return delayForInstantSpells3;
-            // DEEP FREEZE
+            // Deep Freeze
             if (_spell->Id == 44572)
                 return delayForInstantSpells2;
             // Dragon Breath
@@ -5716,10 +5720,10 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
             // Intercept
             if (_spell->Id == 20253)
                 return delayForInstantSpells2;
-            // charge
+            // Charge
             if (_spell->Id == 7922)
                 return NOdelayForInstantSpells;
-            // charge Trg.
+            // Charge trig.
             if (_spell->Id == 65929)
                 return NOdelayForInstantSpells;
             break;
@@ -5751,13 +5755,7 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
     return 0;
 }
 
- if (_spell->Id == 36554)
-	if (m_caster->HasUnitState(UNIT_STATE_ROOT))
-		return SPELL_FAILED_ROOTED;
-				  
- if (_spell->Id == 45334)
-	if (m_caster->HasUnitState(UNIT_STATE_ROOT))
-		return SPELL_FAILED_ROOTED;
+
 
     //Saqirmdev -- Fixes
 

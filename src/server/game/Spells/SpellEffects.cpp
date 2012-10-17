@@ -820,28 +820,27 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                 // Glyph of Mirror Image
                 if (m_caster->HasAura(63093))
                    m_caster->CastSpell(m_caster, 65047, true); // Mirror Image
-
                 break;
             }
 
-          case 35009:             // Invisible
-               m_caster->CombatStop();
-               return;
+          case 35009: // Invisible
+			m_caster->CombatStop();
+				return;
           
 
-          case 58984:             // Shadowmeld
+          case 58984: // Shadowmeld
            {
                m_caster->InterruptSpell(CURRENT_AUTOREPEAT_SPELL); // break Auto Shot and autohit
                m_caster->InterruptSpell(CURRENT_CHANNELED_SPELL);  // break channeled spells
                m_caster->AttackStop();
                ((Player*)m_caster)->SendAttackSwingCancelAttack();
                m_caster->CombatStop();
-               return;
+				 return;
            }
 
              case 49560: // Death Grip
-            if(unitTarget->HasAura(19263)) 
-                 return; 
+				 if(unitTarget->HasAura(19263))
+					 return;
 
             // Vanish (not exist)
             case 18461:
@@ -850,7 +849,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                 unitTarget->InterruptSpell(CURRENT_CHANNELED_SPELL);  // break channeled spells
                 m_caster->AttackStop();
                 m_caster->CombatStop();
-               ((Player*)m_caster)->SendAttackSwingCancelAttack();
+                ((Player*)m_caster)->SendAttackSwingCancelAttack();
                 unitTarget->RemoveMovementImpairingAuras();
                 unitTarget->RemoveAurasByType(SPELL_AURA_MOD_STALKED);
 

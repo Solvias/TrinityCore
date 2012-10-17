@@ -5644,21 +5644,22 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
 
 uint32 Spell::GetCCDelay(SpellInfo const* _spell)
 {
-    // SAQIRMDEV TOOL CC DELAY
+    //Saqirmdev -- Fixes
     AuraType auraWithCCD[] = {
         SPELL_AURA_MOD_STUN,
+		SPELL_AURA_MOD_SILENCE,
         SPELL_AURA_MOD_CONFUSE,
         SPELL_AURA_MOD_FEAR,
         SPELL_AURA_MOD_DISARM,
         SPELL_AURA_MOD_ROOT,
         SPELL_AURA_MOD_POSSESS
     };
-    uint8 CCDArraySize = 6;
+    uint8 CCDArraySize = 7;
 
-    const uint32 delayForInstantSpells = 130;
-    const uint32 STUNdelayForInstantSpells = 50;
-    const uint32 XXdelayForInstantSpells = 160;
-    const uint32 XXXdelayForInstantSpells = 210;
+    const uint32 delayForInstantSpells = 126;
+    const uint32 delayForInstantSpells2 = 50;
+    const uint32 delayForInstantSpells3 = 160;
+    const uint32 delayForInstantSpells4 = 230;
     const uint32 NOdelayForInstantSpells = 0;
 
 
@@ -5693,20 +5694,20 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
                 return NOdelayForInstantSpells;
             // Kidney Shot
             if (_spell->Id == 408)
-                return STUNdelayForInstantSpells;
+                return delayForInstantSpells2;
             break;
         case SPELLFAMILY_SHAMAN:
             // HEX
             if (_spell->Id == 51514)
-                return XXdelayForInstantSpells;
+                return delayForInstantSpells3;
             break;
         case SPELLFAMILY_MAGE:
             // POLYMORPH
             if (_spell->Id == 12826)
-                return XXdelayForInstantSpells;
+                return delayForInstantSpells3;
             // DEEP FREEZE
             if (_spell->Id == 44572)
-                return STUNdelayForInstantSpells;
+                return delayForInstantSpells2;
             // Dragon Breath
             if (_spell->Id == 42950)
                 return delayForInstantSpells;
@@ -5714,7 +5715,7 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
         case SPELLFAMILY_WARRIOR:
             // Intercept
             if (_spell->Id == 20253)
-                return STUNdelayForInstantSpells;
+                return delayForInstantSpells2;
             // charge
             if (_spell->Id == 7922)
                 return NOdelayForInstantSpells;
@@ -5725,15 +5726,18 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
         case SPELLFAMILY_WARLOCK:
             //DeathCoil
             if (_spell->Id == 27223)
-                return XXXdelayForInstantSpells;
+                return delayForInstantSpells4;
+		    //Spell Lock - Debuff
+			if (_spell->Id == 24259)
+			    return delayForInstantSpells4;
            break;
         case SPELLFAMILY_DRUID:
             // Feral charge
             if (_spell->Id == 45334)
-                return STUNdelayForInstantSpells;
+                return delayForInstantSpells2;
             // Cyclone
             if (_spell->Id == 33786)
-                return XXdelayForInstantSpells;
+                return delayForInstantSpells2;
             // Pounce
             if (_spell->Id == 9005)
                 return NOdelayForInstantSpells;
@@ -5747,7 +5751,15 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
     return 0;
 }
 
-    // SAQIRMDEV TOOL CC DELAY END
+ if (_spell->Id == 36554)
+	if (m_caster->HasUnitState(UNIT_STATE_ROOT))
+		return SPELL_FAILED_ROOTED;
+				  
+ if (_spell->Id == 45334)
+	if (m_caster->HasUnitState(UNIT_STATE_ROOT))
+		return SPELL_FAILED_ROOTED;
+
+    //Saqirmdev -- Fixes
 
 SpellCastResult Spell::CheckCasterAuras() const
 {

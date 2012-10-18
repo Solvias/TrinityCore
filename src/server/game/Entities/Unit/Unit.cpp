@@ -5535,7 +5535,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 }
                 case 71519: // Deathbringer's Will Normal
                 {
-                    if (GetTypeId() != TYPEID_PLAYER)
+                    if (GetTypeId() != TYPEID_PLAYER || HasAura(71562))
                         return false;
 
                     std::vector<uint32> RandomSpells;
@@ -5581,7 +5581,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 }
                 case 71562: // Deathbringer's Will Heroic
                 {
-                    if (GetTypeId() != TYPEID_PLAYER)
+					if (GetTypeId() != TYPEID_PLAYER || HasAura(71519))
                         return false;
 
                     std::vector<uint32> RandomSpells;

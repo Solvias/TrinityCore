@@ -2151,6 +2151,14 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     DisableSpline();
 
     if (m_transport)
+
+    if (m_vehicle)
+    {
+        // ExitVehicle();
+        m_vehicle->RemovePassenger(this);
+        m_vehicle = NULL;
+    }
+
     {
         if (options & TELE_TO_NOT_LEAVE_TRANSPORT)
             AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);

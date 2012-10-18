@@ -1420,3 +1420,10 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@NPC2,0,1,0,61,0,100,0,0,0,0,0,72,0,0,0,0,0,0,7,0,0,0,0,0,0,0,"Cenarion Scout Azenel – Link – close gossip"),
 (@NPC3,0,0,1,62,0,100,0,@GOSSIP3,0,0,0,11,25845,1,0,0,0,0,7,0,0,0,0,0,0,0,"Cenarion Scout Jalia – on gossip option select – ast Create Hive'Ashi Scout Report"),
 (@NPC3,0,1,0,61,0,100,0,0,0,0,0,72,0,0,0,0,0,0,7,0,0,0,0,0,0,0,"Cenarion Scout Jalia – Link – close gossip");
+
+UPDATE `gameobject_template` SET `faction` = 0, `flags` = 6553632 WHERE `entry` IN (190356,190357,190358);
+UPDATE `gameobject_template` SET `faction` = 0, `flags` = 32 WHERE `entry` IN (190221,190373,190377,190378);
+
+DELETE FROM `gameobject` WHERE `id`=188488;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`) VALUES
+(245, 188488, 571, 1, 1, 1237.301, -4948.268, 36.02063, 2.495818, 0, 0, 0.9483232, 0.3173059, 300, 0, 1);

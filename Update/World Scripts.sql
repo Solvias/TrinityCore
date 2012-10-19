@@ -1465,3 +1465,11 @@ UPDATE `creature_template` SET `AIName`='SmartAI',`ScriptName`='' WHERE `entry`=
 DELETE FROM `smart_scripts` WHERE `entryorguid`=30444 AND `source_type`=0;
 INSERT INTO `smart_scripts`(`entryorguid`,`event_type`,`event_param1`,`event_param2`,`action_type`,`action_param1`,`target_type`,`comment`) VALUES
 (30444,38,1,1,33,30444,23,'Chieftains Totem - On data set - Give quest credit');
+
+UPDATE `creature_template` SET `InhabitType`=7 WHERE  `entry` in (28499, 32446, 32446, 38266, 36853, 37755, 38265);
+
+update npc_spellclick_spells set cast_flags=1 where npc_entry=30236;
+update npc_spellclick_spells set spell_id=46598 where npc_entry=30236;
+update creature_template set speed_walk=0, speed_run=0 where entry=30236;
+update creature_model_info set gender=2=0 where modelid=27101;
+update creature_template_addon set bytes1=0 where entry=30236;

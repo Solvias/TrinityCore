@@ -1730,3 +1730,88 @@ INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language
 (7998,28,0, 'Superb! Because of your help, my people stand a chance of re-taking our belowed city. Three cheers to you!',12,0,100,0,0,0, 'SAY_BLASTMASTER_28'),
 -- Grubbis
 (7361,0,0, 'We come from below! You can never stop us!',14,0,100,0,0,0, 'SAY_GRUBBIS');
+
+-- Wickerman Festival
+SET @GO_GUID       := xxxxxx; -- set by TDB team (14)
+SET @CREATURE_GUID := xxxxxx; -- set by TDB team (5)
+
+UPDATE `gameobject_template` SET `flags` = 17 WHERE `entry` = 180433;
+DELETE FROM gameobject WHERE id IN (180432,180433,180434,180437,180405,180406) AND guid BETWEEN @GO_GUID+00 AND @GO_GUID+13;
+INSERT INTO `gameobject` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`position_x`,`position_y`,`position_z`,`orientation`,`rotation0`,`rotation1`,`rotation2`,`rotation3`,`spawntimesecs`,`animprogress`,`state`) VALUES
+-- Forsaken Banner
+(@GO_GUID+00,180432,0,1,1,1749.28,507.611,39.2312,1.49635,0,0,0.680301,0.732933,300,0,1),
+(@GO_GUID+01,180432,0,1,1,1712.63,507.05,38.2495,1.58824,0,0,0.713246,0.700914,300,0,1),
+-- The Wickerman
+(@GO_GUID+02,180433,0,1,1,1734.04,504.05,42.2861,1.4131,0,0,0.649213,0.760607,300,0,0),
+-- Bonfire
+(@GO_GUID+03,180434,0,1,1,1758.89,513.276,35.8655,1.28897,0,0,0.600788,0.799409,300,0,1),
+(@GO_GUID+04,180434,0,1,1,1704.48,518.689,35.4045,1.30704,0,0,0.607984,0.793949,300,0,1),
+(@GO_GUID+05,180434,0,1,1,1739.78,473.238,61.6565,1.59371,0,0,0.71516,0.698961,300,0,1),
+(@GO_GUID+06,180434,0,1,1,1717.32,472.723,61.6566,1.59371,0,0,0.71516,0.698961,300,0,1),
+-- Wickerman Ember
+(@GO_GUID+07,180437,0,1,1,1744.62,504.954,40.8518,1.23403,0,0,0.578603,0.81561,300,0,1),
+(@GO_GUID+08,180437,0,1,1,1729.13,510.378,40.8719,1.23403,0,0,0.578603,0.81561,300,0,1),
+(@GO_GUID+09,180437,0,1,1,1721.77,503.938,41.1381,1.23403,0,0,0.578603,0.81561,300,0,1),
+(@GO_GUID+10,180437,0,1,1,1744.96,496.25,41.44,1.24581,0,0,0.583397,0.812187,300,0,1),
+-- G_Pumpkin_01
+(@GO_GUID+11,180405,0,1,1,1746.07,517.066,38.936,2.83466,0,0,0.988247,0.152864,300,0,1),
+(@GO_GUID+12,180405,0,1,1,1728,475.099,63.6779,3.08363,0,0,0.99958,0.0289791,300,0,1),
+-- G_Pumpkin_02
+(@GO_GUID+13,180406,0,1,1,1719.67,522.979,36.8828,2.93283,0,0,0.994557,0.10419,300,0,1);
+
+DELETE FROM `creature` WHERE `id` IN (15195,15197,15199) AND `guid` BETWEEN @CREATURE_GUID+00 AND @CREATURE_GUID+04;
+INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`) VALUES
+-- Wickerman Guardian
+(@CREATURE_GUID+00,15195,0,1,1,0,0,1713.1,511.295,37.2005,1.48063,300,0,0,45780,0,0,0,0,0),
+(@CREATURE_GUID+01,15195,0,1,1,0,0,1750.57,511.697,37.7587,1.25444,300,0,0,45780,0,0,0,0,0),
+(@CREATURE_GUID+02,15195,0,1,1,0,0,1732.31,520.874,36.3326,1.30942,300,0,0,45780,0,0,0,0,0),
+-- Darkcaller Yanka
+(@CREATURE_GUID+03,15197,0,1,1,0,0,1734.6,508.803,41.2847,1.6173,300,0,0,15260,0,0,0,0,0),
+-- Sergeant Hartman
+(@CREATURE_GUID+04,15199,0,1,1,0,0,-813.614,-547.184,15.6377,1.69193,300,0,0,15260,0,0,0,0,0);
+
+DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @GO_GUID+00 AND @GO_GUID+13;
+INSERT INTO `game_event_gameobject` VALUES
+(12,@GO_GUID+00),
+(12,@GO_GUID+01),
+(12,@GO_GUID+02),
+(12,@GO_GUID+03),
+(12,@GO_GUID+04),
+(12,@GO_GUID+05),
+(12,@GO_GUID+06),
+(12,@GO_GUID+07),
+(12,@GO_GUID+08),
+(12,@GO_GUID+09),
+(12,@GO_GUID+10),
+(12,@GO_GUID+11),
+(12,@GO_GUID+12),
+(12,@GO_GUID+13);
+
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @CREATURE_GUID+00 AND @CREATURE_GUID+04;
+INSERT INTO `game_event_creature` VALUES
+(12,@CREATURE_GUID+00),
+(12,@CREATURE_GUID+01),
+(12,@CREATURE_GUID+02),
+(12,@CREATURE_GUID+03),
+(12,@CREATURE_GUID+04);
+
+-- Wickerman Ashes
+DELETE FROM `gossip_menu` WHERE `entry` = 6535;
+INSERT INTO `gossip_menu` VALUES
+(6535,7737),
+(6535,7738);
+DELETE FROM `gossip_menu_option` WHERE `menu_id`=6535 AND `id`=0;
+INSERT INTO `gossip_menu_option` (`menu_id`,`id`,`option_icon`,`option_text`,`option_id`,`npc_option_npcflag`,`action_menu_id`,`action_poi_id`,`box_coded`,`box_money`,`box_text`) VALUES
+(6535,0,0,"Smear the ash on my face like war paint!",1,1,0,0,0,0,"");
+-- gossip conditions
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` IN (14,15) AND `SourceGroup`=6535;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES
+(14,6535,7738,0,0,1,0,24705,0,0,0,0,"","Wickerman Ember - Show different gossip if player is affected by aura 24705"),
+(14,6535,7737,0,0,1,0,24705,0,0,1,0,"","Wickerman Ember - Show different gossip if player is affected by aura 24705"),
+(15,6535,   0,0,0,1,0,24705,0,0,1,0,"","Wickerman Ember - Show different gossip option if player is affected by aura 24705");
+-- GO smart script
+UPDATE `gameobject_template` SET `AIName`='SmartGameObjectAI' WHERE `entry`=180437;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=180437 AND `source_type`=1;
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES 
+(180437, 1, 0, 1, 62, 0, 100, 0, 6535, 0, 0, 0, 85, 24705, 34, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 'Wickerman Ember - on Gossip Select - Cast Invocation of the Wickerman'),
+(180437, 1, 1, 0, 61, 0, 100, 0,    0, 0, 0, 0, 72,     0,  0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 'Wickerman Ember - on Link - Close gossip');

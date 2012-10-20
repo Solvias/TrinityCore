@@ -1473,3 +1473,260 @@ update npc_spellclick_spells set spell_id=46598 where npc_entry=30236;
 update creature_template set speed_walk=0, speed_run=0 where entry=30236;
 update creature_model_info set gender=2=0 where modelid=27101;
 update creature_template_addon set bytes1=0 where entry=30236;
+-- Update position for Koltira Deathweaver
+UPDATE `creature_transport` SET `TransOffsetX`=45.50927,`TransOffsetY`=6.679555,`TransOffsetZ`=30.17881,`TransOffsetO`=5.445427 WHERE `guid`=36;
+
+-- Set proper name and period timers for icecrown ships
+UPDATE `transports` SET `name`= 'Alliance gunship patrolling above Icecrown (\"The Skybreaker\")',`period`=1051388 WHERE `entry`=192242;
+UPDATE `transports` SET `name`= 'Horde gunship patrolling above Icecrown (\"Orgrim''s Hammer\")',`period`=1431158 WHERE `entry`=192241;
+
+-- Gnomeregan/Blastmaster Emi Shortfuse's event
+DELETE FROM `script_texts` WHERE `entry` BETWEEN -1090028 AND -1090000;
+DELETE FROM `creature_text` WHERE `entry` IN (7361,7998);
+INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `comment`) VALUES
+-- Emi Shortfuse
+(7998,0,0, 'With your help, I can evaluate these tunnels.',12,0,100,0,0,0, 'SAY_BLASTMASTER_0'),
+(7998,1,0, 'Let''s see if we can find out where these Troggs are coming from... and put a stop to the invasion!',12,0,100,0,0,0, 'SAY_BLASTMASTER_1'),
+(7998,2,0, 'Such devastation... what horrible mess...',12,0,100,0,0,0, 'SAY_BLASTMASTER_2'),
+(7998,3,0, 'It''s quiet here...',12,0,100,0,0,0, 'SAY_BLASTMASTER_3'),
+(7998,4,0, '...too quiet.',12,0,100,0,0,0, 'SAY_BLASTMASTER_4'),
+(7998,5,0, 'Look! Over there at the tunnel wall!',12,0,100,0,0,0, 'SAY_BLASTMASTER_5'),
+(7998,6,0, 'Trogg incrusion! Defend me while I blast the hole closed!',12,0,100,0,0,0, 'SAY_BLASTMASTER_6'),
+(7998,7,0, 'The charges are set. Get back before they blow!',12,0,100,0,0,0, 'SAY_BLASTMASTER_7'),
+(7998,8,0, 'Incoming blast in 10 seconds!',14,0,100,0,0,0, 'SAY_BLASTMASTER_8'),
+(7998,9,0, 'Incoming blast in 5 seconds. Clear the tunnel!',14,0,100,0,0,0, 'SAY_BLASTMASTER_9'),
+(7998,10,0, 'FIRE IN THE HOLE!',14,0,100,0,0,0, 'SAY_BLASTMASTER_10'),
+(7998,11,0, 'Well done! Without your help I would have never been able to thwart that wave of troggs.',12,0,100,0,0,0, 'SAY_BLASTMASTER_11'),
+(7998,12,0, 'Did you hear something?',12,0,100,0,0,0, 'SAY_BLASTMASTER_12'),
+(7998,13,0, 'I heard something over there.',12,0,100,0,0,0, 'SAY_BLASTMASTER_13'),
+(7998,14,0, 'More troggs! Ward them off as I prepare the explosives!',12,0,100,0,0,0, 'SAY_BLASTMASTER_14'),
+(7998,15,0, 'The final charge is set. Stand back!',12,0,100,0,0,0, 'SAY_BLASTMASTER_15'),
+(7998,16,0, 'The final charge is set. Stand back!',12,0,100,0,0,0, 'SAY_BLASTMASTER_16'),
+(7998,17,0, 'Incoming blast in 10 seconds!',14,0,100,0,0,0, 'SAY_BLASTMASTER_17'),
+(7998,18,0, 'Incoming blast in 5 seconds. Clear the tunnel!',14,0,100,0,0,0, 'SAY_BLASTMASTER_18'),
+(7998,19,0, 'I don''t think one charge is going to cut it. Keep fending them off!',12,0,100,0,0,0, 'SAY_BLASTMASTER_19'),
+(7998,20,0, 'FIRE IN THE HOLE!',14,0,100,0,0,0, 'SAY_BLASTMASTER_20'),
+(7998,21,0, 'Well done! Without your help I would have never been able to thwart that wave of troggs.',12,0,100,0,0,0, 'SAY_BLASTMASTER_21'),
+(7998,22,0, 'Did you hear something?',12,0,100,0,0,0, 'SAY_BLASTMASTER_22'),
+(7998,23,0, 'I heard something over there.',12,0,100,0,0,0, 'SAY_BLASTMASTER_23'),
+(7998,24,0, 'More troggs! Ward them off as I prepare the explosives!',12,0,100,0,0,0, 'SAY_BLASTMASTER_24'),
+(7998,25,0, 'The final charge is set. Stand back!',12,0,100,0,0,0, 'SAY_BLASTMASTER_25'),
+(7998,26,0, '10 seconds to blast! Stand back!!!',14,0,100,0,0,0, 'SAY_BLASTMASTER_26'),
+(7998,27,0, '5 seconds until detonation!!',14,0,100,0,0,0, 'SAY_BLASTMASTER_27'),
+(7998,28,0, 'Superb! Because of your help, my people stand a chance of re-taking our belowed city. Three cheers to you!',12,0,100,0,0,0, 'SAY_BLASTMASTER_28'),
+-- Grubbis
+(7361,0,0, 'We come from below! You can never stop us!',14,0,100,0,0,0, 'SAY_GRUBBIS');
+
+DELETE FROM `battleground_template` WHERE `id` = 6; -- all Bgs
+SET @GUID = 74685;
+SET @MAP = 571;
+DELETE FROM `gameobject` WHERE (`id` IN (192254,192255,192269,192284,192285,192336,192338,192339,192349,192350,192351,192352,192353,192354,192355,192356,192357,192358,192359,192360,192361,192362,192363,192364,192366,192367,192368,192369,192370,192371,192372,192373,192374,192375,192378,192379,192416,192488,192501) AND `guid` != 67250) OR `guid` BETWEEN @GUID AND @GUID+87;
+INSERT INTO `gameobject` (`guid`,`id`,`map`,`phaseMask`,`position_x`,`position_y`,`position_z`,`orientation`) VALUES
+(@GUID+0, 192488, @MAP, 64, 5262.540039, 3047.949951, 432.054993, 3.106650),   -- Flag on tower 
+(@GUID+1, 192501, @MAP, 128, 5262.540039, 3047.949951, 432.054993, 3.106650),   -- Flag on tower
+(@GUID+2, 192374, @MAP, 64, 5272.939941, 2976.550049, 444.492004, 3.124120),   -- Flag on Wall Intersect 
+(@GUID+3, 192416, @MAP, 128, 5272.939941, 2976.550049, 444.492004, 3.124120),   -- Flag on Wall Intersect
+(@GUID+4, 192375, @MAP, 64, 5235.189941, 2941.899902, 444.278015, 1.588250),   -- Flag on Wall Intersect 
+(@GUID+5, 192416, @MAP, 128, 5235.189941, 2941.899902, 444.278015, 1.588250),   -- Flag on Wall Intersect
+(@GUID+6, 192488, @MAP, 64, 5163.129883, 2952.590088, 433.502991, 1.535890),   -- Flag on tower 
+(@GUID+7, 192501, @MAP, 128, 5163.129883, 2952.590088, 433.502991, 1.535890),   -- Flag on tower
+(@GUID+8, 192488, @MAP, 64, 5145.109863, 2935.000000, 433.385986, 3.141590),   -- Flag on tower 
+(@GUID+9, 192501, @MAP, 128, 5145.109863, 2935.000000, 433.385986, 3.141590),   -- Flag on tower
+(@GUID+10, 192488, @MAP, 64, 5158.810059, 2883.129883, 431.618011, 3.141590),   -- Flag on wall 
+(@GUID+11, 192416, @MAP, 128, 5158.810059, 2883.129883, 431.618011, 3.141590),   -- Flag on wall
+(@GUID+12, 192336, @MAP, 64, 5154.490234, 2862.149902, 445.011993, 3.141590),   -- Flag on Wall Intersect 
+(@GUID+13, 192416, @MAP, 128, 5154.490234, 2862.149902, 445.011993, 3.141590),   -- Flag on Wall Intersect
+(@GUID+14, 192255, @MAP, 64, 5154.520020, 2853.310059, 409.183014, 3.141590),   -- Flag on the floor 
+(@GUID+15, 192269, @MAP, 128, 5154.520020, 2853.310059, 409.183014, 3.141590),   -- Flag on the floor
+(@GUID+16, 192254, @MAP, 64, 5154.459961, 2828.939941, 409.188995, 3.141590),   -- Flag on the floor 
+(@GUID+17, 192269, @MAP, 128, 5154.459961, 2828.939941, 409.188995, 3.141590),   -- Flag on the floor
+(@GUID+18, 192349, @MAP, 64, 5155.310059, 2820.739990, 444.979004, -3.13286),   -- Flag on wall intersect 
+(@GUID+19, 192416, @MAP, 128, 5155.310059, 2820.739990, 444.979004, -3.13286),   -- Flag on wall intersect
+(@GUID+20, 192488, @MAP, 64, 5160.339844, 2798.610107, 430.769012, 3.141590),   -- Flag on wall 
+(@GUID+21, 192416, @MAP, 128, 5160.339844, 2798.610107, 430.769012, 3.141590),   -- Flag on wall
+(@GUID+22, 192488, @MAP, 64, 5146.040039, 2747.209961, 433.584015, 3.071770),   -- Flag on tower 
+(@GUID+23, 192501, @MAP, 128, 5146.040039, 2747.209961, 433.584015, 3.071770),   -- Flag on tower
+(@GUID+24, 192488, @MAP, 64, 5163.779785, 2729.679932, 433.394012, -1.58825),   -- Flag on tower 
+(@GUID+25, 192501, @MAP, 128, 5163.779785, 2729.679932, 433.394012, -1.58825),   -- Flag on tower
+(@GUID+26, 192366, @MAP, 64, 5236.270020, 2739.459961, 444.992004, -1.59698),   -- Flag on wall intersect 
+(@GUID+27, 192416, @MAP, 128, 5236.270020, 2739.459961, 444.992004, -1.59698),   -- Flag on wall intersect
+(@GUID+28, 192367, @MAP, 64, 5271.799805, 2704.870117, 445.183014, -3.13286),   -- Flag on wall intersect 
+(@GUID+29, 192416, @MAP, 128, 5271.799805, 2704.870117, 445.183014, -3.13286),   -- Flag on wall intersect
+(@GUID+30, 192488, @MAP, 64, 5260.819824, 2631.800049, 433.324005, 3.054330),   -- Flag on tower 
+(@GUID+31, 192501, @MAP, 128, 5260.819824, 2631.800049, 433.324005, 3.054330),   -- Flag on tower
+(@GUID+32, 192488, @MAP, 64, 5278.379883, 2613.830078, 433.408997, -1.58825),   -- Flag on tower 
+(@GUID+33, 192501, @MAP, 128, 5278.379883, 2613.830078, 433.408997, -1.58825),   -- Flag on tower
+(@GUID+34, 192364, @MAP, 64, 5350.879883, 2622.719971, 444.686005, -1.57080),   -- Flag on wall intersect 
+(@GUID+35, 192416, @MAP, 128, 5350.879883, 2622.719971, 444.686005, -1.57080),   -- Flag on wall intersect
+(@GUID+36, 192370, @MAP, 64, 5392.270020, 2639.739990, 435.330994, 1.509710),   -- Flag on wall intersect 
+(@GUID+37, 192416, @MAP, 128, 5392.270020, 2639.739990, 435.330994, 1.509710),   -- Flag on wall intersect
+(@GUID+38, 192369, @MAP, 64, 5350.950195, 2640.360107, 435.407990, 1.570800),   -- Flag on wall intersect 
+(@GUID+39, 192416, @MAP, 128, 5350.950195, 2640.360107, 435.407990, 1.570800),   -- Flag on wall intersect
+(@GUID+40, 192368, @MAP, 64, 5289.459961, 2704.679932, 435.875000, -0.01745),   -- Flag on wall intersect 
+(@GUID+41, 192416, @MAP, 128, 5289.459961, 2704.679932, 435.875000, -0.01745),   -- Flag on wall intersect
+(@GUID+42, 192362, @MAP, 64, 5322.120117, 2763.610107, 444.973999, -1.55334),   -- Flag on wall intersect 
+(@GUID+43, 192416, @MAP, 128, 5322.120117, 2763.610107, 444.973999, -1.55334),   -- Flag on wall intersect
+(@GUID+44, 192363, @MAP, 64, 5363.609863, 2763.389893, 445.023987, -1.54462),   -- Flag on wall intersect 
+(@GUID+45, 192416, @MAP, 128, 5363.609863, 2763.389893, 445.023987, -1.54462),   -- Flag on wall intersect
+(@GUID+46, 192379, @MAP, 64, 5363.419922, 2781.030029, 435.763000, 1.570800),   -- Flag on wall intersect 
+(@GUID+47, 192416, @MAP, 128, 5363.419922, 2781.030029, 435.763000, 1.570800),   -- Flag on wall intersect
+(@GUID+48, 192378, @MAP, 64, 5322.020020, 2781.129883, 435.811005, 1.570800),   -- Flag on wall intersect 
+(@GUID+49, 192416, @MAP, 128, 5322.020020, 2781.129883, 435.811005, 1.570800),   -- Flag on wall intersect
+(@GUID+50, 192355, @MAP, 64, 5288.919922, 2820.219971, 435.721008, 0.017452),   -- Flag on wall intersect 
+(@GUID+51, 192416, @MAP, 128, 5288.919922, 2820.219971, 435.721008, 0.017452),   -- Flag on wall intersect
+(@GUID+52, 192354, @MAP, 64, 5288.410156, 2861.790039, 435.721008, 0.017452),   -- Flag on wall intersect 
+(@GUID+53, 192416, @MAP, 128, 5288.410156, 2861.790039, 435.721008, 0.017452),   -- Flag on wall intersect
+(@GUID+54, 192358, @MAP, 64, 5322.229980, 2899.429932, 435.808014, -1.58825),   -- Flag on wall intersect 
+(@GUID+55, 192416, @MAP, 128, 5322.229980, 2899.429932, 435.808014, -1.58825),   -- Flag on wall intersect
+(@GUID+56, 192359, @MAP, 64, 5364.350098, 2899.399902, 435.838989, -1.57080),   -- Flag on wall intersect 
+(@GUID+57, 192416, @MAP, 128, 5364.350098, 2899.399902, 435.838989, -1.57080),   -- Flag on wall intersect
+(@GUID+58, 192338, @MAP, 64, 5397.759766, 2873.080078, 455.460999, 3.106650),   -- Flag on keep 
+(@GUID+59, 192416, @MAP, 128, 5397.759766, 2873.080078, 455.460999, 3.106650),   -- Flag on keep
+(@GUID+60, 192339, @MAP, 64, 5397.390137, 2809.330078, 455.343994, 3.106650),   -- Flag on keep 
+(@GUID+61, 192416, @MAP, 128, 5397.390137, 2809.330078, 455.343994, 3.106650),   -- Flag on keep
+(@GUID+62, 192284, @MAP, 64, 5372.479980, 2862.500000, 409.049011, 3.141590),   -- Flag on floor 
+(@GUID+63, 192269, @MAP, 128, 5372.479980, 2862.500000, 409.049011, 3.141590),   -- Flag on floor
+(@GUID+64, 192285, @MAP, 64, 5371.490234, 2820.800049, 409.177002, 3.141590),   -- Flag on floor 
+(@GUID+65, 192269, @MAP, 128, 5371.490234, 2820.800049, 409.177002, 3.141590),   -- Flag on floor
+(@GUID+66, 192371, @MAP, 64, 5364.290039, 2916.939941, 445.330994, 1.579520),   -- Flag on wall intersect 
+(@GUID+67, 192416, @MAP, 128, 5364.290039, 2916.939941, 445.330994, 1.579520),   -- Flag on wall intersect
+(@GUID+68, 192372, @MAP, 64, 5322.859863, 2916.949951, 445.153992, 1.562070),   -- Flag on wall intersect 
+(@GUID+69, 192416, @MAP, 128, 5322.859863, 2916.949951, 445.153992, 1.562070),   -- Flag on wall intersect
+(@GUID+70, 192373, @MAP, 64, 5290.350098, 2976.560059, 435.221008, 0.017452),   -- Flag on wall intersect 
+(@GUID+71, 192416, @MAP, 128, 5290.350098, 2976.560059, 435.221008, 0.017452),   -- Flag on wall intersect
+(@GUID+72, 192360, @MAP, 64, 5352.370117, 3037.090088, 435.252014, -1.57080),   -- Flag on wall intersect 
+(@GUID+73, 192416, @MAP, 128, 5352.370117, 3037.090088, 435.252014, -1.57080),   -- Flag on wall intersect
+(@GUID+74, 192361, @MAP, 64, 5392.649902, 3037.110107, 433.713013, -1.52716),   -- Flag on wall intersect 
+(@GUID+75, 192416, @MAP, 128, 5392.649902, 3037.110107, 433.713013, -1.52716),   -- Flag on wall intersect
+(@GUID+76, 192356, @MAP, 64, 5237.069824, 2757.030029, 435.795990, 1.518440),   -- Flag on wall intersect 
+(@GUID+77, 192416, @MAP, 128, 5237.069824, 2757.030029, 435.795990, 1.518440),   -- Flag on wall intersect
+(@GUID+78, 192352, @MAP, 64, 5173.020020, 2820.929932, 435.720001, 0.017452),   -- Flag on wall intersect 
+(@GUID+79, 192416, @MAP, 128, 5173.020020, 2820.929932, 435.720001, 0.017452),   -- Flag on wall intersect
+(@GUID+80, 192353, @MAP, 64, 5172.109863, 2862.570068, 435.721008, 0.017452),   -- Flag on wall intersect 
+(@GUID+81, 192416, @MAP, 128, 5172.109863, 2862.570068, 435.721008, 0.017452),   -- Flag on wall intersect
+(@GUID+82, 192357, @MAP, 64, 5235.339844, 2924.340088, 435.040009, -1.57080),   -- Flag on wall intersect 
+(@GUID+83, 192416, @MAP, 128, 5235.339844, 2924.340088, 435.040009, -1.57080),   -- Flag on wall intersect
+(@GUID+84, 192350, @MAP, 64, 5270.689941, 2861.780029, 445.058014, -3.11539),   -- Flag on wall intersect 
+(@GUID+85, 192416, @MAP, 128, 5270.689941, 2861.780029, 445.058014, -3.11539),   -- Flag on wall intersect
+(@GUID+86, 192351, @MAP, 64, 5271.279785, 2820.159912, 445.200989, -3.13286),   -- Flag on wall intersect 
+(@GUID+87, 192416, @MAP, 128, 5271.279785, 2820.159912, 445.200989, -3.13286);   -- Flag on wall intersect
+
+UPDATE `creature_loot_template` SET `chanceOrQuestChance`=-50 WHERE `item`=23239;
+UPDATE `spell_proc_event` SET `procflags`=0x15510 WHERE `entry`=53386;
+
+DELETE FROM `spell_group` WHERE `id`=1037;
+INSERT INTO `spell_group`(`id`,`spell_id`) VALUES
+(1037,22959),
+(1037,17800),
+(1037,12579);
+
+DELETE FROM `spell_group_stack_rules` WHERE `group_id`=1037;
+INSERT INTO `spell_group_stack_rules`(`group_id`,`stack_rule`) VALUES (1037,3);
+
+-- Blood Frenzy (Warrior) and Savage Combat effect should not stack
+DELETE FROM `spell_group` WHERE `id`=1119;
+INSERT INTO `spell_group`(`id`,`spell_id`) VALUES
+(1119,30069),
+(1119,58684);
+
+DELETE FROM `spell_group_stack_rules` WHERE `group_id`=1119;
+INSERT INTO `spell_group_stack_rules`(`group_id`,`stack_rule`) VALUES (1119,3);
+
+-- Remove invalid spell_groups
+DELETE FROM `spell_group` WHERE `id` IN (1038,1039);
+
+SET @GROUP := 1120;
+-- Totem of Wrath and Heart of the Crusader effect should not stack
+DELETE FROM `spell_group` WHERE `id`=@GROUP;
+INSERT INTO `spell_group`(`id`,`spell_id`) VALUES
+(@GROUP,21183),
+(@GROUP,30708);
+
+DELETE FROM `spell_group_stack_rules` WHERE `group_id`=@GROUP;
+INSERT INTO `spell_group_stack_rules`(`group_id`,`stack_rule`) VALUES (@GROUP,3);
+
+ALTER TABLE `spell_area` ADD COLUMN `quest_start_status` INT(11) NOT NULL DEFAULT 64; -- default is QUEST_STATUS_REWARDED
+ALTER TABLE `spell_area` ADD COLUMN `quest_end_status` INT(11) NOT NULL DEFAULT 11; -- default is QUEST_STATUS_COMPLETE | QUEST_STATUS_NONE | QUEST_STATUS_INCOMPLETE
+UPDATE spell_area SET `quest_start_status` = (1 << 6) | (1 << 3) | (1 << 1) WHERE `quest_start_active` = 1;
+ALTER TABLE spell_area DROP COLUMN `quest_start_active`;
+
+-- Orb rotation focus
+UPDATE `creature_template` SET `modelid1`=11868,`modelid2`=169,`minlevel`=80,`maxlevel`=80,`faction_A`=14,`faction_H`=14,`speed_walk`=2.2,`speed_run`=0.785714,`baseattacktime`=2000,`unit_flags`=33554688 WHERE `entry` IN(43280,43281,43282);
+UPDATE `creature_template` SET `difficulty_entry_1`=43280, `difficulty_entry_2`=43281,`difficulty_entry_3`=43282 WHERE `entry`=40091;
+
+-- Orb carrier
+UPDATE `creature_template` SET `minlevel`=80,`maxlevel`=80,`exp`=2,`faction_A`=14,`faction_H`=14,`speed_walk`=1.2,`speed_run`=1.14286,`baseattacktime`=2000 WHERE `entry` IN(40470,40471,40472);
+UPDATE `creature_template` SET `difficulty_entry_1`=40470, `difficulty_entry_2`=40471,`difficulty_entry_3`=40472 WHERE `entry`=40081;
+
+-- Saviana Ragefire
+UPDATE `creature_template` SET `exp`=2 WHERE `entry`=39823;
+
+-- General Zarithrian
+UPDATE `creature_template` SET `exp`=2 WHERE `entry`=39805;
+
+-- Twilight Halion
+UPDATE `creature_template` SET `difficulty_entry_1`=40143, `difficulty_entry_2`=40144,`difficulty_entry_3`=40145 WHERE `entry`=40142;
+UPDATE `creature_template` SET `minlevel`=83,`maxlevel`=83,`speed_walk`=1.6,`speed_run`=1.42857,`baseattacktime`=1800,`unit_flags`=559168,`dynamicflags`=12 WHERE `entry` IN(40143,40144,40145);
+
+-- Halion
+UPDATE `creature_template` SET `speed_walk`=1.6,`speed_run`=1.42857,`baseattacktime`=1500,`unit_flags`=32832,`dynamicflags`=12,`flags_extra`=1 WHERE `entry` IN(39864,39944,39945);
+UPDATE `creature_template` SET `dmg_multiplier`=50 WHERE `entry`=39944;
+UPDATE `creature_template` SET `dmg_multiplier`=85 WHERE `entry`=39945;
+
+-- Onyx Flamecaller
+UPDATE `creature_template` SET `minlevel`=82,`maxlevel`=82,`faction_A`=103,`faction_H`=103,`exp`=2,`speed_walk`=0.88888,`speed_run`=1.42857,`baseattacktime`=2000,`unit_flags`=32768,`equipment_id`=2468 WHERE `entry`=39815;
+
+DELETE FROM `trinity_string` WHERE `entry` IN (9986, 9987, 9989, 9990, 9991, 9992, 9993, 9994, 9995, 9996, 9997, 9998, 9999);
+INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`)
+VALUES
+  (9986, 'Error', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  (9987, 'None', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  (9988, 'Leader', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  (9989, 'Dps', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  (9990, 'Healer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  (9991, 'Tank', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  (9992, 'Raid browser', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  (9993, 'Finished dungeon', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  (9994, 'In dungeon', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  (9995, 'Vote kick', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  (9996, 'Proposal', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  (9997, 'Queued', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  (9998, 'Role check', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  (9999, 'None', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+  
+  -- Gnomeregan/Blastmaster Emi Shortfuse's event
+DELETE FROM `script_texts` WHERE `entry` BETWEEN -1090028 AND -1090000;
+DELETE FROM `creature_text` WHERE `entry` IN (7361,7998);
+INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `comment`) VALUES
+-- Emi Shortfuse
+(7998,0,0, 'With your help, I can evaluate these tunnels.',12,0,100,0,0,0, 'SAY_BLASTMASTER_0'),
+(7998,1,0, 'Let''s see if we can find out where these Troggs are coming from... and put a stop to the invasion!',12,0,100,0,0,0, 'SAY_BLASTMASTER_1'),
+(7998,2,0, 'Such devastation... what horrible mess...',12,0,100,0,0,0, 'SAY_BLASTMASTER_2'),
+(7998,3,0, 'It''s quiet here...',12,0,100,0,0,0, 'SAY_BLASTMASTER_3'),
+(7998,4,0, '...too quiet.',12,0,100,0,0,0, 'SAY_BLASTMASTER_4'),
+(7998,5,0, 'Look! Over there at the tunnel wall!',12,0,100,0,0,0, 'SAY_BLASTMASTER_5'),
+(7998,6,0, 'Trogg incrusion! Defend me while I blast the hole closed!',12,0,100,0,0,0, 'SAY_BLASTMASTER_6'),
+(7998,7,0, 'The charges are set. Get back before they blow!',12,0,100,0,0,0, 'SAY_BLASTMASTER_7'),
+(7998,8,0, 'Incoming blast in 10 seconds!',14,0,100,0,0,0, 'SAY_BLASTMASTER_8'),
+(7998,9,0, 'Incoming blast in 5 seconds. Clear the tunnel!',14,0,100,0,0,0, 'SAY_BLASTMASTER_9'),
+(7998,10,0, 'FIRE IN THE HOLE!',14,0,100,0,0,0, 'SAY_BLASTMASTER_10'),
+(7998,11,0, 'Well done! Without your help I would have never been able to thwart that wave of troggs.',12,0,100,0,0,0, 'SAY_BLASTMASTER_11'),
+(7998,12,0, 'Did you hear something?',12,0,100,0,0,0, 'SAY_BLASTMASTER_12'),
+(7998,13,0, 'I heard something over there.',12,0,100,0,0,0, 'SAY_BLASTMASTER_13'),
+(7998,14,0, 'More troggs! Ward them off as I prepare the explosives!',12,0,100,0,0,0, 'SAY_BLASTMASTER_14'),
+(7998,15,0, 'The final charge is set. Stand back!',12,0,100,0,0,0, 'SAY_BLASTMASTER_15'),
+(7998,16,0, 'The final charge is set. Stand back!',12,0,100,0,0,0, 'SAY_BLASTMASTER_16'),
+(7998,17,0, 'Incoming blast in 10 seconds!',14,0,100,0,0,0, 'SAY_BLASTMASTER_17'),
+(7998,18,0, 'Incoming blast in 5 seconds. Clear the tunnel!',14,0,100,0,0,0, 'SAY_BLASTMASTER_18'),
+(7998,19,0, 'I don''t think one charge is going to cut it. Keep fending them off!',12,0,100,0,0,0, 'SAY_BLASTMASTER_19'),
+(7998,20,0, 'FIRE IN THE HOLE!',14,0,100,0,0,0, 'SAY_BLASTMASTER_20'),
+(7998,21,0, 'Well done! Without your help I would have never been able to thwart that wave of troggs.',12,0,100,0,0,0, 'SAY_BLASTMASTER_21'),
+(7998,22,0, 'Did you hear something?',12,0,100,0,0,0, 'SAY_BLASTMASTER_22'),
+(7998,23,0, 'I heard something over there.',12,0,100,0,0,0, 'SAY_BLASTMASTER_23'),
+(7998,24,0, 'More troggs! Ward them off as I prepare the explosives!',12,0,100,0,0,0, 'SAY_BLASTMASTER_24'),
+(7998,25,0, 'The final charge is set. Stand back!',12,0,100,0,0,0, 'SAY_BLASTMASTER_25'),
+(7998,26,0, '10 seconds to blast! Stand back!!!',14,0,100,0,0,0, 'SAY_BLASTMASTER_26'),
+(7998,27,0, '5 seconds until detonation!!',14,0,100,0,0,0, 'SAY_BLASTMASTER_27'),
+(7998,28,0, 'Superb! Because of your help, my people stand a chance of re-taking our belowed city. Three cheers to you!',12,0,100,0,0,0, 'SAY_BLASTMASTER_28'),
+-- Grubbis
+(7361,0,0, 'We come from below! You can never stop us!',14,0,100,0,0,0, 'SAY_GRUBBIS');

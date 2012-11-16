@@ -1865,7 +1865,7 @@ Player* ObjectMgr::GetPlayerByLowGUID(uint32 lowguid) const
 }
 
 // name must be checked to correctness (if received) before call this function
-uint64 ObjectMgr::GetPlayerGUIDByName(std::string name) const
+uint64 ObjectMgr::GetPlayerGUIDByName(std::string const& name) const
 {
     uint64 guid = 0;
 
@@ -2610,6 +2610,28 @@ ItemTemplate const* ObjectMgr::GetItemTemplate(uint32 entry)
     return NULL;
 }
 
+uint32 ObjectMgr::GetFakeItemEntry(uint32 itemGuid)
+{
+    FakeItemsContainer::const_iterator itr = _fakeItemsStore.find(itemGuid);
+    if (itr != _fakeItemsStore.end())
+        return itr->second;
+
+    return 0;
+}
+
+void ObjectMgr::SetFekeItem(uint32 itemGuid, uint32 fakeEntry)
+{
+    _fakeItemsStore[itemGuid] = fakeEntry;
+}
+
+void ObjectMgr::RemoveFakeItem(uint32 itemGuid)
+{
+    FakeItemsContainer::iterator itr = _fakeItemsStore.find(itemGuid);
+    if (itr != _fakeItemsStore.end())
+        _fakeItemsStore.erase(itr);
+}
+
+
 void ObjectMgr::LoadItemSetNameLocales()
 {
     uint32 oldMSTime = getMSTime();
@@ -2717,6 +2739,31 @@ void ObjectMgr::LoadItemSetNames()
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u item set names in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
+
+void ObjectMgr::LoadFakeItems()
+{
+    QueryResult result = CharacterDatabase.Query("SELECT `guid`, `fakeEntry` FROM `fake_items`");
+
+    if (!result)
+    {
+        sLog->outError(LOG_FILTER_SQL, ">> Loaded 0 fake items. DB table `fake_items` is empty.");
+        return;
+    }
+
+    do
+    {
+        Field* fields    = result->Fetch();
+
+        uint32 guid      = fields[0].GetUInt32();
+        uint32 fakeEntry = fields[1].GetUInt32();
+
+        _fakeItemsStore[guid] = fakeEntry;
+    }
+    while (result->NextRow());
+
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u fake items.", _fakeItemsStore.size());
+}
+
 
 void ObjectMgr::LoadVehicleTemplateAccessories()
 {
@@ -7062,7 +7109,7 @@ void ObjectMgr::DeleteCorpseCellData(uint32 mapid, uint32 cellid, uint32 player_
     cell_guids.corpses.erase(player_guid);
 }
 
-void ObjectMgr::LoadQuestRelationsHelper(QuestRelations& map, std::string table, bool starter, bool go)
+void ObjectMgr::LoadQuestRelationsHelper(QuestRelations& map, std::string const& table, bool starter, bool go)
 {
     uint32 oldMSTime = getMSTime();
 
@@ -7075,7 +7122,6 @@ void ObjectMgr::LoadQuestRelationsHelper(QuestRelations& map, std::string table,
     if (!result)
     {
         sLog->outError(LOG_FILTER_SQL, ">> Loaded 0 quest relations from `%s`, table is empty.", table.c_str());
-
         return;
     }
 

@@ -63,6 +63,7 @@
 #include "GameObjectAI.h"
 #include "AccountMgr.h"
 #include "InstanceScript.h"
+#include "PathGenerator.h"
 
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
 {
@@ -360,7 +361,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     case 51963:
                     {
                         // about +4 base spell dmg per level
-                        damage = (m_caster->getLevel() - 60) * 4 + 60;
+                        damage = (m_caster->getLevel() - 60) * 4 + 20;
                         break;
                     }
                 }
@@ -548,7 +549,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                                         unitTarget->RemoveAuraFromStack(spellId);
 
                                 damage *= doses;
-                                damage += int32(player->GetTotalAttackPowerValue(BASE_ATTACK) * 0.09f * combo);
+                                damage += int32(player->GetTotalAttackPowerValue(BASE_ATTACK) * 0.1055f * combo);
                             }
 
                             // Eviscerate and Envenom Bonus Damage (item set effect)
@@ -565,7 +566,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         if (uint32 combo = ((Player*)m_caster)->GetComboPoints())
                         {
                             float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
-                            damage += irand(int32(ap * combo * 0.03f), int32(ap * combo * 0.07f));
+                            damage += irand(int32(ap * combo * 0.03f), int32(ap * combo * 0.075f));
 
                             // Eviscerate and Envenom Bonus Damage (item set effect)
                             if (m_caster->HasAura(37169))
@@ -819,12 +820,29 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                 // Glyph of Mirror Image
                 if (m_caster->HasAura(63093))
                    m_caster->CastSpell(m_caster, 65047, true); // Mirror Image
-
                 break;
             }
+
+          case 35009: // Invisible
+		   m_caster->CombatStop();
+		      return;
+
+          case 62196: // Shadow. Trigger
+             m_caster->CombatStop();
+                return;
+
+          case 58984: // Shadowmeld
+             m_caster->CombatStop();
+                return;
+
             // Vanish (not exist)
             case 18461:
             {
+                m_caster->InterruptSpell(CURRENT_AUTOREPEAT_SPELL); // break Auto Shot and autohit
+                unitTarget->InterruptSpell(CURRENT_CHANNELED_SPELL);  // break channeled spells
+                m_caster->AttackStop();
+                m_caster->CombatStop();
+                ((Player*)m_caster)->SendAttackSwingCancelAttack();
                 unitTarget->RemoveMovementImpairingAuras();
                 unitTarget->RemoveAurasByType(SPELL_AURA_MOD_STALKED);
 
@@ -1778,7 +1796,7 @@ void Spell::EffectCreateItem2(SpellEffIndex effIndex)
     {
         if (item_id)
         {
-            if (!player->HasItemCount(item_id, 1))
+            if (!player->HasItemCount(item_id))
                 return;
 
             // remove reagent
@@ -1988,7 +2006,7 @@ void Spell::SendLoot(uint64 guid, LootType loottype)
         if (!gameObjTarget->isSpawned() && !player->isGameMaster())
         {
             sLog->outError(LOG_FILTER_SPELLS_AURAS, "Possible hacking attempt: Player %s [guid: %u] tried to loot a gameobject [entry: %u id: %u] which is on respawn time without being in GM mode!",
-                            player->GetName(), player->GetGUIDLow(), gameObjTarget->GetEntry(), gameObjTarget->GetGUIDLow());
+                            player->GetName().c_str(), player->GetGUIDLow(), gameObjTarget->GetEntry(), gameObjTarget->GetGUIDLow());
             return;
         }
         // special case, already has GossipHello inside so return and avoid calling twice
@@ -2399,7 +2417,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                             // randomize position for multiple summons
                             m_caster->GetRandomPoint(*destTarget, radius, pos);
 
-                        summon = m_originalCaster->SummonCreature(entry, *destTarget, summonType, duration);
+                        summon = m_originalCaster->SummonCreature(entry, pos, summonType, duration);
                         if (!summon)
                             continue;
 
@@ -2798,9 +2816,9 @@ void Spell::EffectEnchantItemPerm(SpellEffIndex effIndex)
         if (item_owner != p_caster && !AccountMgr::IsPlayerAccount(p_caster->GetSession()->GetSecurity()) && sWorld->getBoolConfig(CONFIG_GM_LOG_TRADE))
         {
             sLog->outCommand(p_caster->GetSession()->GetAccountId(), "GM %s (Account: %u) enchanting(perm): %s (Entry: %d) for player: %s (Account: %u)",
-                p_caster->GetName(), p_caster->GetSession()->GetAccountId(),
+                p_caster->GetName().c_str(), p_caster->GetSession()->GetAccountId(),
                 itemTarget->GetTemplate()->Name1.c_str(), itemTarget->GetEntry(),
-                item_owner->GetName(), item_owner->GetSession()->GetAccountId());
+                item_owner->GetName().c_str(), item_owner->GetSession()->GetAccountId());
         }
 
         // remove old enchanting before applying new if equipped
@@ -2863,9 +2881,9 @@ void Spell::EffectEnchantItemPrismatic(SpellEffIndex effIndex)
     if (item_owner != p_caster && !AccountMgr::IsPlayerAccount(p_caster->GetSession()->GetSecurity()) && sWorld->getBoolConfig(CONFIG_GM_LOG_TRADE))
     {
         sLog->outCommand(p_caster->GetSession()->GetAccountId(), "GM %s (Account: %u) enchanting(perm): %s (Entry: %d) for player: %s (Account: %u)",
-            p_caster->GetName(), p_caster->GetSession()->GetAccountId(),
+            p_caster->GetName().c_str(), p_caster->GetSession()->GetAccountId(),
             itemTarget->GetTemplate()->Name1.c_str(), itemTarget->GetEntry(),
-            item_owner->GetName(), item_owner->GetSession()->GetAccountId());
+            item_owner->GetName().c_str(), item_owner->GetSession()->GetAccountId());
     }
 
     // remove old enchanting before applying new if equipped
@@ -2997,9 +3015,9 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
     if (item_owner != p_caster && !AccountMgr::IsPlayerAccount(p_caster->GetSession()->GetSecurity()) && sWorld->getBoolConfig(CONFIG_GM_LOG_TRADE))
     {
         sLog->outCommand(p_caster->GetSession()->GetAccountId(), "GM %s (Account: %u) enchanting(temp): %s (Entry: %d) for player: %s (Account: %u)",
-            p_caster->GetName(), p_caster->GetSession()->GetAccountId(),
+            p_caster->GetName().c_str(), p_caster->GetSession()->GetAccountId(),
             itemTarget->GetTemplate()->Name1.c_str(), itemTarget->GetEntry(),
-            item_owner->GetName(), item_owner->GetSession()->GetAccountId());
+            item_owner->GetName().c_str(), item_owner->GetSession()->GetAccountId());
     }
 
     // remove old enchanting before applying new if equipped
@@ -3095,6 +3113,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
     // if pet requested type already exist
     if (OldSummon)
     {
+        OldSummon->m_CreatureSpellCooldowns.clear();
         if (petentry == 0 || OldSummon->GetEntry() == petentry)
         {
             // pet in corpse state can't be summoned
@@ -3330,7 +3349,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 }
 
                 if (found)
-                    totalDamagePercentMod *= 1.2f;          // 120% if poisoned
+                    totalDamagePercentMod *= 1.16f;          // 116% if poisoned
             }
             break;
         }
@@ -3928,7 +3947,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     const char *gender = "his";
                     if (m_caster->getGender() > 0)
                         gender = "her";
-                    sprintf(buf, "%s rubs %s [Decahedral Dwarven Dice] between %s hands and rolls. One %u and one %u.", m_caster->GetName(), gender, gender, urand(1, 10), urand(1, 10));
+                    sprintf(buf, "%s rubs %s [Decahedral Dwarven Dice] between %s hands and rolls. One %u and one %u.", m_caster->GetName().c_str(), gender, gender, urand(1, 10), urand(1, 10));
                     m_caster->MonsterTextEmote(buf, 0);
                     break;
                 }
@@ -3939,7 +3958,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     const char *gender = "his";
                     if (m_caster->getGender() > 0)
                         gender = "her";
-                    sprintf(buf, "%s causually tosses %s [Worn Troll Dice]. One %u and one %u.", m_caster->GetName(), gender, urand(1, 6), urand(1, 6));
+                    sprintf(buf, "%s causually tosses %s [Worn Troll Dice]. One %u and one %u.", m_caster->GetName().c_str(), gender, urand(1, 6), urand(1, 6));
                     m_caster->MonsterTextEmote(buf, 0);
                     break;
                 }
@@ -4549,7 +4568,7 @@ void Spell::EffectStuck(SpellEffIndex /*effIndex*/)
     Player* target = (Player*)m_caster;
 
     sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell Effect: Stuck");
-    sLog->outInfo(LOG_FILTER_SPELLS_AURAS, "Player %s (guid %u) used auto-unstuck future at map %u (%f, %f, %f)", target->GetName(), target->GetGUIDLow(), m_caster->GetMapId(), m_caster->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
+    sLog->outInfo(LOG_FILTER_SPELLS_AURAS, "Player %s (guid %u) used auto-unstuck future at map %u (%f, %f, %f)", target->GetName().c_str(), target->GetGUIDLow(), m_caster->GetMapId(), m_caster->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
 
     if (target->isInFlight())
         return;
@@ -5104,31 +5123,29 @@ void Spell::EffectSkinning(SpellEffIndex /*effIndex*/)
 
 void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
 {
+    if (!unitTarget)
+        return;
+
     if (effectHandleMode == SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
     {
-        if (!unitTarget)
-            return;
-
-        float angle = unitTarget->GetRelativeAngle(m_caster);
-        Position pos;
-
-        unitTarget->GetContactPoint(m_caster, pos.m_positionX, pos.m_positionY, pos.m_positionZ);
-        unitTarget->GetFirstCollisionPosition(pos, unitTarget->GetObjectSize(), angle);
-
-        m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + unitTarget->GetObjectSize());
+        if (m_preGeneratedPath.GetPathType() & PATHFIND_NOPATH)
+        {
+            Position pos;
+            unitTarget->GetContactPoint(m_caster, pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+            unitTarget->GetFirstCollisionPosition(pos, unitTarget->GetObjectSize(), unitTarget->GetRelativeAngle(m_caster));
+            m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+        }
+        else
+            m_caster->GetMotionMaster()->MoveCharge(m_preGeneratedPath);
     }
 
     if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET)
     {
-        if (!unitTarget)
-            return;
-
         // not all charge effects used in negative spells
         if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER)
             m_caster->Attack(unitTarget, true);
     }
 }
-
 void Spell::EffectChargeDest(SpellEffIndex /*effIndex*/)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH)

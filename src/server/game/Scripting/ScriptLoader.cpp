@@ -24,6 +24,13 @@ void AddSC_example_gossip_codebox();
 void AddSC_example_misc();
 void AddSC_example_commandscript();
 
+// SAQIRMDEV USEFULL FIXES! A SAQIRM JE PAN
+void AddSC_transmogrify_script();
+void AddSC_arena_spectator_script();
+void AddSC_utility_commandscript();
+void AddSC_npc_teleport();
+void AddSC_npc_supporter();
+
 // spells
 void AddSC_deathknight_spell_scripts();
 void AddSC_druid_spell_scripts();
@@ -61,6 +68,7 @@ void AddSC_guild_commandscript();
 void AddSC_honor_commandscript();
 void AddSC_instance_commandscript();
 void AddSC_learn_commandscript();
+void AddSC_lfg_commandscript();
 void AddSC_list_commandscript();
 void AddSC_lookup_commandscript();
 void AddSC_message_commandscript();
@@ -75,6 +83,7 @@ void AddSC_tele_commandscript();
 void AddSC_ticket_commandscript();
 void AddSC_titles_commandscript();
 void AddSC_wp_commandscript();
+void AddSC_mmaps_commandscript();
 
 #ifdef SCRIPTS
 //world
@@ -89,6 +98,7 @@ void AddSC_npc_innkeeper();
 void AddSC_npcs_special();
 void AddSC_npc_taxi();
 void AddSC_achievement_scripts();
+void AddSC_event_scripts();
 
 //eastern kingdoms
 void AddSC_alterac_valley();                 //Alterac Valley
@@ -681,6 +691,7 @@ void AddCommandScripts()
     AddSC_instance_commandscript();
     AddSC_learn_commandscript();
     AddSC_lookup_commandscript();
+    AddSC_lfg_commandscript();
     AddSC_list_commandscript();
     AddSC_message_commandscript();
     AddSC_misc_commandscript();
@@ -694,6 +705,7 @@ void AddCommandScripts()
     AddSC_ticket_commandscript();
     AddSC_titles_commandscript();
     AddSC_wp_commandscript();
+    AddSC_mmaps_commandscript();
 }
 
 void AddWorldScripts()
@@ -711,6 +723,7 @@ void AddWorldScripts()
     AddSC_npc_taxi();
     AddSC_achievement_scripts();
     AddSC_chat_log();
+    AddSC_event_scripts();
 #endif
 }
 
@@ -1260,13 +1273,19 @@ void AddBattlegroundScripts()
 
 #ifdef SCRIPTS
 /* This is where custom scripts' loading functions should be declared. */
-
+       void AddSC_EM_trader();
 #endif
 
 void AddCustomScripts()
 {
 #ifdef SCRIPTS
     /* This is where custom scripts should be added. */
+    AddSC_transmogrify_script();
+    AddSC_arena_spectator_script();
+    AddSC_utility_commandscript();
+    AddSC_EM_trader();
+    AddSC_npc_teleport();
+	AddSC_npc_supporter();
 
 #endif
 }

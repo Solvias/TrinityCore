@@ -131,12 +131,12 @@ void BattlegroundMgr::Update(uint32 diff)
         if (m_NextRatedArenaUpdate < diff)
         {
             // forced update for rated arenas (scan all, but skipped non rated)
-            sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattlegroundMgr: UPDATING ARENA QUEUES");
+            sLog->outTrace(LOG_FILTER_ARENAS, "BattlegroundMgr: UPDATING ARENA QUEUES");
             for (int qtype = BATTLEGROUND_QUEUE_2v2; qtype <= BATTLEGROUND_QUEUE_5v5; ++qtype)
                 for (int bracket = BG_BRACKET_ID_FIRST; bracket < MAX_BATTLEGROUND_BRACKETS; ++bracket)
                     m_BattlegroundQueues[qtype].BattlegroundQueueUpdate(diff,
                         BATTLEGROUND_AA, BattlegroundBracketId(bracket),
-                        BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId(qtype)), true, 0);
+                 BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId(qtype)), true, 0);
 
             m_NextRatedArenaUpdate = sWorld->getIntConfig(CONFIG_ARENA_RATED_UPDATE_TIMER);
         }
@@ -873,11 +873,11 @@ void BattlegroundMgr::SendToBattleground(Player* player, uint32 instanceId, Batt
             team = player->GetTeam();
 
         bg->GetTeamStartLoc(team, x, y, z, O);
-        sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattlegroundMgr::SendToBattleground: Sending %s to map %u, X %f, Y %f, Z %f, O %f (bgType %u)", player->GetName(), mapid, x, y, z, O, bgTypeId);
+        sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattlegroundMgr::SendToBattleground: Sending %s to map %u, X %f, Y %f, Z %f, O %f (bgType %u)", player->GetName().c_str(), mapid, x, y, z, O, bgTypeId);
         player->TeleportTo(mapid, x, y, z, O);
     }
     else
-        sLog->outError(LOG_FILTER_BATTLEGROUND, "BattlegroundMgr::SendToBattleground: Instance %u (bgType %u) not found while trying to teleport player %s", instanceId, bgTypeId, player->GetName());
+        sLog->outError(LOG_FILTER_BATTLEGROUND, "BattlegroundMgr::SendToBattleground: Instance %u (bgType %u) not found while trying to teleport player %s", instanceId, bgTypeId, player->GetName().c_str());
 }
 
 void BattlegroundMgr::SendAreaSpiritHealerQueryOpcode(Player* player, Battleground* bg, uint64 guid)
@@ -904,25 +904,25 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
 {
     switch (bgTypeId)
     {
-        case BATTLEGROUND_WS:
-            return BATTLEGROUND_QUEUE_WS;
         case BATTLEGROUND_AB:
             return BATTLEGROUND_QUEUE_AB;
         case BATTLEGROUND_AV:
             return BATTLEGROUND_QUEUE_AV;
         case BATTLEGROUND_EY:
             return BATTLEGROUND_QUEUE_EY;
-        case BATTLEGROUND_SA:
-            return BATTLEGROUND_QUEUE_SA;
         case BATTLEGROUND_IC:
             return BATTLEGROUND_QUEUE_IC;
         case BATTLEGROUND_RB:
             return BATTLEGROUND_QUEUE_RB;
+	    case BATTLEGROUND_SA:
+            return BATTLEGROUND_QUEUE_SA;
+        case BATTLEGROUND_WS:
+            return BATTLEGROUND_QUEUE_WS;
         case BATTLEGROUND_AA:
-        case BATTLEGROUND_NA:
-        case BATTLEGROUND_RL:
         case BATTLEGROUND_BE:
         case BATTLEGROUND_DS:
+		case BATTLEGROUND_NA:	
+        case BATTLEGROUND_RL:
         case BATTLEGROUND_RV:
             switch (arenaType)
             {

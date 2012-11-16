@@ -400,6 +400,9 @@ typedef UNORDERED_MAP<uint32, PointOfInterestLocale> PointOfInterestLocaleContai
 typedef std::multimap<uint32, uint32> QuestRelations;
 typedef std::pair<QuestRelations::const_iterator, QuestRelations::const_iterator> QuestRelationBounds;
 
+typedef std::map<uint32, uint32> FakeItemsContainer;
+
+
 struct PetLevelInfo
 {
     PetLevelInfo() : health(0), mana(0) { for (uint8 i=0; i < MAX_STATS; ++i) stats[i] = 0; }
@@ -639,6 +642,11 @@ class ObjectMgr
             return NULL;
         }
 
+        uint32 GetFakeItemEntry(uint32 itemGuid);
+        void SetFekeItem(uint32 itemGuid, uint32 fakeEntry);
+        void RemoveFakeItem(uint32 itemGuid);
+
+
         InstanceTemplate const* GetInstanceTemplate(uint32 mapId);
 
         PetLevelInfo const* GetPetLevelInfo(uint32 creature_id, uint8 level) const;
@@ -665,11 +673,11 @@ class ObjectMgr
 
         void GetPlayerLevelInfo(uint32 race, uint32 class_, uint8 level, PlayerLevelInfo* info) const;
 
-        uint64 GetPlayerGUIDByName(std::string name) const;
+        uint64 GetPlayerGUIDByName(std::string const& name) const;
         bool GetPlayerNameByGUID(uint64 guid, std::string &name) const;
         uint32 GetPlayerTeamByGUID(uint64 guid) const;
         uint32 GetPlayerAccountIdByGUID(uint64 guid) const;
-        uint32 GetPlayerAccountIdByPlayerName(const std::string& name) const;
+        uint32 GetPlayerAccountIdByPlayerName(std::string const& name) const;
 
         uint32 GetNearestTaxiNode(float x, float y, float z, uint32 mapid, uint32 team);
         void GetTaxiPath(uint32 source, uint32 destination, uint32 &path, uint32 &cost);
@@ -861,6 +869,7 @@ class ObjectMgr
         void LoadGameobjects();
         void LoadItemTemplates();
         void LoadItemLocales();
+        void LoadFakeItems();
         void LoadItemSetNames();
         void LoadItemSetNameLocales();
         void LoadQuestLocales();
@@ -1057,12 +1066,12 @@ class ObjectMgr
 
         // reserved names
         void LoadReservedPlayersNames();
-        bool IsReservedName(const std::string& name) const;
+        bool IsReservedName(std::string const& name) const;
 
         // name with valid structure and symbols
-        static uint8 CheckPlayerName(const std::string& name, bool create = false);
-        static PetNameInvalidReason CheckPetName(const std::string& name);
-        static bool IsValidCharterName(const std::string& name);
+        static uint8 CheckPlayerName(std::string const& name, bool create = false);
+        static PetNameInvalidReason CheckPetName(std::string const& name);
+        static bool IsValidCharterName(std::string const& name);
 
         static bool CheckDeclinedNames(std::wstring w_ownname, DeclinedName const& names);
 
@@ -1072,10 +1081,10 @@ class ObjectMgr
             if (itr == _gameTeleStore.end()) return NULL;
             return &itr->second;
         }
-        GameTele const* GetGameTele(const std::string& name) const;
+        GameTele const* GetGameTele(std::string const& name) const;
         GameTeleContainer const& GetGameTeleMap() const { return _gameTeleStore; }
         bool AddGameTele(GameTele& data);
-        bool DeleteGameTele(const std::string& name);
+        bool DeleteGameTele(std::string const& name);
 
         TrainerSpellData const* GetNpcTrainerSpells(uint32 entry) const
         {
@@ -1130,7 +1139,7 @@ class ObjectMgr
         // for wintergrasp only
         GraveYardContainer GraveYardStore;
 
-        static void AddLocaleString(const std::string& s, LocaleConstant locale, StringVector& data);
+        static void AddLocaleString(std::string const& s, LocaleConstant locale, StringVector& data);
         static inline void GetLocaleString(const StringVector& data, int loc_idx, std::string& value)
         {
             if (data.size() > size_t(loc_idx) && !data[loc_idx].empty())
@@ -1222,7 +1231,7 @@ class ObjectMgr
     private:
         void LoadScripts(ScriptsType type);
         void CheckScripts(ScriptsType type, std::set<int32>& ids);
-        void LoadQuestRelationsHelper(QuestRelations& map, std::string table, bool starter, bool go);
+        void LoadQuestRelationsHelper(QuestRelations& map, std::string const& table, bool starter, bool go);
         void PlayerCreateInfoAddItemHelper(uint32 race_, uint32 class_, uint32 itemId, int32 count);
 
         MailLevelRewardContainer _mailLevelRewardStore;
@@ -1271,6 +1280,7 @@ class ObjectMgr
         ItemTemplateContainer _itemTemplateStore;
         ItemLocaleContainer _itemLocaleStore;
         ItemSetNameLocaleContainer _itemSetNameLocaleStore;
+        FakeItemsContainer _fakeItemsStore;
         QuestLocaleContainer _questLocaleStore;
         NpcTextLocaleContainer _npcTextLocaleStore;
         PageTextLocaleContainer _pageTextLocaleStore;

@@ -26,6 +26,7 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "Group.h"
+#include "Unit.h"
 
 enum PaladinSpells
 {
@@ -105,7 +106,7 @@ public:
                 // Cast healing spell, completely avoid damage
                 absorbAmount = dmgInfo.GetDamage();
 
-                uint32 defenseSkillValue = victim->GetDefenseSkillValue();
+                 uint32 defenseSkillValue = 5 * victim->getLevel();
                 // Max heal when defense skill denies critical hits from raid bosses
                 // Formula: max defense at level + 140 (raiting from gear)
                 uint32 reqDefForMaxHeal  = victim->getLevel() * 5 + 140;
@@ -123,7 +124,7 @@ public:
                 uint32 damageToReduce = (victim->GetHealth() < allowedHealth)
                     ? dmgInfo.GetDamage()
                     : allowedHealth - remainingHealth;
-                absorbAmount = CalculatePctN(damageToReduce, absorbPct);
+                absorbAmount = CalculatePct(damageToReduce, absorbPct);
             }
         }
 
@@ -140,6 +141,36 @@ public:
     }
 };
 
+class spell_pal_sacred_shield : public SpellScriptLoader
+{
+    public:
+        spell_pal_sacred_shield() : SpellScriptLoader("spell_pal_sacred_shield") { }
+
+        class spell_pal_sacred_shield_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_pal_sacred_shield_AuraScript);
+
+            void Absorb(AuraEffect* aurEff, DamageInfo & dmgInfo, uint32 & absorbAmount)
+			{
+
+		    absorbAmount = dmgInfo.GetDamage();
+
+            Unit* caster = GetCaster();
+			  if (caster->HealthBelowPct(30))
+                 caster->CastSpell(caster, 96263, true);
+
+			}
+            void Register()
+            {
+				OnEffectAbsorb += AuraEffectAbsorbFn(spell_pal_sacred_shield_AuraScript::Absorb, EFFECT_0);
+            }	
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_pal_sacred_shield_AuraScript();
+        }
+};
 
 class spell_pal_blessing_of_faith : public SpellScriptLoader
 {
@@ -678,33 +709,6 @@ class spell_pal_divine_sacrifice : public SpellScriptLoader
         {
             return new spell_pal_divine_sacrifice_AuraScript();
         }
-};
-
-class spell_pal_sacred_shield : public SpellScriptLoader
-{
-    public:
-        spell_pal_sacred_shield() : SpellScriptLoader("spell_pal_sacred_shield") { }
-
-        class spell_pal_sacred_shield_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_pal_sacred_shield_SpellScript);
-
-            void HandleScript()
-			{
-            Unit* caster = GetCaster();
-			  if (caster->HealthBelowPct(30))
-                 caster->CastSpell(caster, 96263, true);
-			}
-            void Register()
-            {
-                OnHit += SpellCheckCastFn(spell_pal_sacred_shield_SpellScript);
-            }	
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_pal_sacred_shield_SpellScript();
-       }
 };
 
 class spell_pal_holy_wrath : public SpellScriptLoader

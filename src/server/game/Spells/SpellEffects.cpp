@@ -1,4 +1,4 @@
-/*
+/*Epic Relase
  * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -1196,22 +1196,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             break;
                     }
                 }
-			 if (m_spellInfo->Id == 85256) //Templar´s Verdic
-                {
-                    switch(m_caster->GetPower(POWER_HOLY_POWER))
-                    {
-                        case 0:
-                            damage = int32((damage * 1.00f) *0.39);
-                            break;
-                        case 1: 
-                            damage = int32((damage * 1.00f) *1.17);
-                            break;
-                        case 2: 
-                            damage = int32((damage * 1.00f) *3.06);
-                            break;
-                    }
-                }
-             break;
             }
             case SPELLFAMILY_DEATHKNIGHT:
             {
@@ -3814,6 +3798,31 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             }
             break;
         }
+		case SPELLFAMILY_PALADIN:
+        {
+            // TODO: Move this to script.
+            // Templar's Verdict
+            if (m_spellInfo->Id == 85256)
+            {
+                if (m_caster->HasAura(90174)) // Divine Purpose Proc
+                {
+                    totalDamagePercentMod += 6.5f;
+                    break;
+                }
+
+                switch (m_caster->GetPower(POWER_HOLY_POWER))
+                {
+                    // 2 Holy Power
+                case 1:
+                    totalDamagePercentMod += 2.0f; // 3*30 = 90%
+                    break;
+                    // 3 Holy Power
+                case 2:
+                    totalDamagePercentMod += 6.5f; // 7.5*30 = 225%
+                    break;
+                }
+            }
+        }
         case SPELLFAMILY_ROGUE:
         {
             // Hemorrhage
@@ -3831,6 +3840,26 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
         }
         case SPELLFAMILY_SHAMAN:
         {
+          switch (m_spellInfo->Id)
+           {
+              case 2484:  //Earth Grasp
+              {
+                if (m_caster->HasAura(51485))
+				   {
+                     spell_id = 64695;
+                        m_caster->CastSpell(m_caster, 64695, true);
+				   }
+
+				if (m_caster->HasAura(51483)){
+                    if (roll_chance_i(50))
+					{
+                       spell_id = 64695;
+                        m_caster->CastSpell(m_caster, 64695, true);
+					}
+				}
+				break;
+              }
+           }
             // Skyshatter Harness item set bonus
             // Stormstrike
             if (AuraEffect* aurEff = m_caster->IsScriptOverriden(m_spellInfo, 5634))

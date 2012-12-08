@@ -3551,6 +3551,7 @@ void Spell::SendSpellCooldown()
         return;
 
     _player->AddSpellAndCategoryCooldowns(m_spellInfo, m_CastItem ? m_CastItem->GetEntry() : 0, this);
+
 }
 
 void Spell::update(uint32 difftime)

@@ -6522,45 +6522,28 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 basepoints0 = (int32)GetAttackTime(BASE_ATTACK) * int32(ap * 0.011f + 0.022f * holy) / 1000;
                 break;
             }
-            // Light's Beacon - Beacon of Light
+           // Light's Beacon - Beacon of Light
             if (dummySpell->Id == 53651)
             {
-                if (!victim)
-                    return false;
-                triggered_spell_id = 0;
-                Unit* beaconTarget = NULL;
-                if (GetTypeId() != TYPEID_PLAYER)
+                // Get target of beacon of light
+                if (Unit* beaconTarget = triggeredByAura->GetBase()->GetCaster())
                 {
-                    beaconTarget = triggeredByAura->GetBase()->GetCaster();
-                    if (!beaconTarget || beaconTarget == this || !(beaconTarget->GetAura(53563, victim->GetGUID())))
+                    // do not proc when target of beacon of light is healed
+                    if (beaconTarget == this)
                         return false;
-                    basepoints0 = int32(damage);
-                    triggered_spell_id = procSpell->IsRankOf(sSpellMgr->GetSpellInfo(635)) ? 53652 : 53654;
-                }
-                else
-                {    // Check Party/Raid Group
-                    if (Group* group = ToPlayer()->GetGroup())
+                    // check if it was heal by paladin which casted this beacon of light
+                    if (beaconTarget->GetAura(53563, victim->GetGUID()))
                     {
-                        for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                        if (beaconTarget->IsWithinLOSInMap(victim))
                         {
-                            if (Player* member = itr->getSource())
-                            {
-                                // check if it was heal by paladin which casted this beacon of light
-                                if (member->GetAura(53563, victim->GetGUID()))
-                                {
-                                    // do not proc when target of beacon of light is healed
-                                    if (member == this)
-                                        return false;
-
-                                    beaconTarget = member;
-                                    basepoints0 = int32(damage);
-                                    triggered_spell_id = procSpell->IsRankOf(sSpellMgr->GetSpellInfo(635)) ? 53652 : 53654;
-                                    break;
-                                }
-                            }
+                            basepoints0 = damage;
+                            victim->CastCustomSpell(beaconTarget, 53652, &basepoints0, NULL, NULL, true);
+                            return true;
                         }
                     }
                 }
+                return false;
+            }
 
                 if (triggered_spell_id && beaconTarget)
                 {
@@ -8141,6 +8124,16 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
             // When your health drops below 20%
             if (HealthBelowPctDamaged(20, damage) || HealthBelowPct(20))
                 return false;
+            break;
+        }
+        // Sacred Shield
+        case 85285:
+        {
+            if (!HealthBelowPctDamaged(30, damage))
+                return false;
+
+            int32 ap = int32(GetTotalAttackPowerValue(BASE_ATTACK) * 0.9f);
+            basepoints0 = int32(CalculatePct(ap, 280));
             break;
         }
         // Greater Heal Refund (Avatar Raiment set)

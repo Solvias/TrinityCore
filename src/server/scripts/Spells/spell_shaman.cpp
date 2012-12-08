@@ -132,62 +132,46 @@ public:
     }
 };
 
-// 6474 - Earthbind Totem - Fix Talent:Earthen Power, Earth's Grasp
-/// Updated 4.3.4
+// 6474 - Earthbind Totem - Fix Talent:Earthen Power
 class spell_sha_earthbind_totem : public SpellScriptLoader
 {
-    public:
-        spell_sha_earthbind_totem() : SpellScriptLoader("spell_sha_earthbind_totem") { }
+public:
+    spell_sha_earthbind_totem() : SpellScriptLoader("spell_sha_earthbind_totem") { }
 
-        class spell_sha_earthbind_totem_AuraScript : public AuraScript
+    class spell_sha_earthbind_totem_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_sha_earthbind_totem_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellEntry*/)
         {
-            PrepareAuraScript(spell_sha_earthbind_totem_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellEntry*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SHAMAN_TOTEM_SPELL_EARTHBIND_TOTEM) || !sSpellMgr->GetSpellInfo(SHAMAN_TOTEM_SPELL_EARTHEN_POWER))
-                    return false;
-                return true;
-            }
-
-            void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
-            {
-                if (!GetCaster())
-                    return;
-                if (Player* owner = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself())
-                    if (AuraEffect* aur = owner->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 2289, 0))
-                        if (roll_chance_i(aur->GetBaseAmount()))
-                            GetTarget()->CastSpell((Unit*)NULL, SHAMAN_TOTEM_SPELL_EARTHEN_POWER, true);
-            }
-            void Apply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                Player* owner = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
-
-                // Earth's Grasp
-                if (GetCaster()->HasAura(51483))
-                {
-                    if (roll_chance_i(50))
-                        GetCaster()->CastSpell(GetCaster(), EARTHBIND_TOTEM_SPELL_EARTHGRAB, true);
-                }
-
-			    if (GetCaster()->HasAura(51485))
-                {
-                        GetCaster()->CastSpell(GetCaster(), EARTHBIND_TOTEM_SPELL_EARTHGRAB, true);
-                }
-            }
-
-            void Register()
-            {
-                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_sha_earthbind_totem_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-                 OnEffectApply += AuraEffectApplyFn(spell_sha_earthbind_totem_AuraScript::Apply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_sha_earthbind_totem_AuraScript();
+            if (!sSpellMgr->GetSpellInfo(SHAMAN_TOTEM_SPELL_EARTHBIND_TOTEM))
+                return false;
+            if (!sSpellMgr->GetSpellInfo(SHAMAN_TOTEM_SPELL_EARTHEN_POWER))
+                return false;
+            return true;
         }
+
+        void HandleEffectPeriodic(AuraEffect const* aurEff)
+        {
+            Unit* target = GetTarget();
+            if (Unit *caster = aurEff->GetBase()->GetCaster()->GetOwner())
+                if (AuraEffect* aur = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 2289, 0))
+                    if (roll_chance_i(aur->GetBaseAmount()))
+                        target->CastSpell(caster, SHAMAN_TOTEM_SPELL_EARTHEN_POWER, true, NULL, aurEff);
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_sha_earthbind_totem_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_sha_earthbind_totem_AuraScript();
+    }
 };
+
 
 class EarthenPowerTargetSelector
 {

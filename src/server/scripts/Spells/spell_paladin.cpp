@@ -59,6 +59,7 @@ enum PaladinSpells
 
 	SPELL_PALADIN_CONSECRATION_SUMMON            = 82366,
     SPELL_PALADIN_CONSECRATION_DAMAGE            = 81297,
+
 	SPELL_PALADIN_WORD_OF_GLORY                  = 85673,
     SPELL_PALADIN_SELFLESS_HEALER_PROC           = 90811,
     SPELL_DIVINE_PURPOSE_PROC                    = 90174,
@@ -139,37 +140,6 @@ public:
     {
         return new spell_pal_ardent_defender_AuraScript();
     }
-};
-
-class spell_pal_sacred_shield : public SpellScriptLoader
-{
-    public:
-        spell_pal_sacred_shield() : SpellScriptLoader("spell_pal_sacred_shield") { }
-
-        class spell_pal_sacred_shield_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_pal_sacred_shield_AuraScript);
-
-            void Absorb(AuraEffect* aurEff, DamageInfo & dmgInfo, uint32 & absorbAmount)
-			{
-
-		    absorbAmount = dmgInfo.GetDamage();
-
-            Unit* caster = GetCaster();
-			  if (caster->HealthBelowPct(30))
-                 caster->CastSpell(caster, 96263, true);
-
-			}
-            void Register()
-            {
-				OnEffectAbsorb += AuraEffectAbsorbFn(spell_pal_sacred_shield_AuraScript::Absorb, EFFECT_0);
-            }	
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_pal_sacred_shield_AuraScript();
-        }
 };
 
 class spell_pal_blessing_of_faith : public SpellScriptLoader
@@ -858,17 +828,17 @@ public:
             {
                 case 0: // 1 Holy Power
                 {
-                    totalheal = totalheal;
+                    totalheal *= 1.0;
                     break;
                 }
                 case 1: // 2 Holy Power
                 {
-                    totalheal *= 2;
+                    totalheal *= 2.0;
                     break;
                 }
                 case 2: // 3 Holy Power
                 {
-                    totalheal *= 3;
+                    totalheal *= 3.0;
                     break;
                 }
             }
@@ -1133,7 +1103,6 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_divine_storm_dummy();
     new spell_pal_lay_on_hands();
     new spell_pal_righteous_defense();
-    new spell_pal_sacred_shield();
 	new spell_pal_holy_wrath();
 	new spell_pal_consecration();
 	new spell_pal_word_of_glory();

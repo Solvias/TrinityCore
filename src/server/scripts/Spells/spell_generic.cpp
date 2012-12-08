@@ -16,7 +16,7 @@
  */
 
 /*
- * Scripts for spells with SPELLFAMILY_GENERIC which cannot be included in AI script file
+ * Scripts for spells with SPELLFAMILY_GENERIC which cannot be included in AI script file.
  * of creature using it or can't be bound to any player class.
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_gen_"
@@ -3448,7 +3448,6 @@ void AddSC_generic_spell_scripts()
     new spell_gen_trick();
     new spell_gen_trick_or_treat();
     new spell_creature_permanent_feign_death();
-    new spell_pvp_trinket_wotf_shared_cd();
     new spell_gen_animal_blood();
     new spell_gen_divine_storm_cd_reset();
     new spell_gen_parachute_ic();

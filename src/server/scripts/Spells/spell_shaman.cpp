@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -38,7 +38,8 @@ enum ShamanSpells
     HUNTER_SPELL_INSANITY                  = 95809,
     MAGE_SPELL_TEMPORAL_DISPLACEMENT       = 80354,
 
-    SHAMAN_SPELL_EARTH_GRASP               = 51483,
+    SHAMAN_SPELL_EARTH_GRASP_R1            = 51483,
+    SHAMAN_SPELL_EARTH_GRASP_R2            = 51485,
     EARTHBIND_TOTEM_SPELL_EARTHGRAB        = 64695,
 
 	//Totemic Wrath
@@ -155,14 +156,33 @@ public:
         {
             Unit* target = GetTarget();
             if (Unit *caster = aurEff->GetBase()->GetCaster()->GetOwner())
-                if (AuraEffect* aur = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 2289, 0))
+              if (AuraEffect* aur = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 2289, 0))
                     if (roll_chance_i(aur->GetBaseAmount()))
                         target->CastSpell(caster, SHAMAN_TOTEM_SPELL_EARTHEN_POWER, true, NULL, aurEff);
         }
 
+		    void Apply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (!GetCaster())
+                    return;
+                Player* owner = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
+                if (!owner)
+                    return;
+                // Earth's Grasp
+                if (AuraEffect* aurEff = owner->GetAuraEffectOfRankedSpell(SHAMAN_SPELL_EARTH_GRASP_R1, EFFECT_0))
+                {
+                    if (roll_chance_i(aurEff->GetAmount()))
+                        GetCaster()->CastSpell(GetCaster(), EARTHBIND_TOTEM_SPELL_EARTHGRAB, false);
+                }
+				// Earth's Grasp
+                if (AuraEffect* aurEff = owner->GetAuraEffectOfRankedSpell(SHAMAN_SPELL_EARTH_GRASP_R2, EFFECT_0))
+                        GetCaster()->CastSpell(GetCaster(), EARTHBIND_TOTEM_SPELL_EARTHGRAB, false);
+            }
+
         void Register()
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_sha_earthbind_totem_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+			OnEffectApply += AuraEffectApplyFn(spell_sha_earthbind_totem_AuraScript::Apply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
@@ -842,7 +862,7 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_totemic_wrath();
     new spell_sha_fulmination();
     new spell_sha_astral_shift();
-	new spell_sha_healing_rain();
-	new spell_sha_mana_tide();
-	new spell_sha_earthquake();
+    new spell_sha_healing_rain();
+    new spell_sha_mana_tide();
+    new spell_sha_earthquake();
 }

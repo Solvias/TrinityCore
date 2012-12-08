@@ -7050,7 +7050,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 					CastSpell(this, 64695, true);
                     triggered_spell_id = 64695;
                 break;
-				}
+				} 
 			}
             // Frozen Power
             if (dummySpell->SpellIconID == 3780)

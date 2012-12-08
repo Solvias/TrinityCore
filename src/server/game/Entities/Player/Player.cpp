@@ -7384,6 +7384,8 @@ void Player::_SaveCurrency(SQLTransaction& trans)
 
     for (PlayerCurrenciesMap::iterator itr = _currencyStorage.begin(); itr != _currencyStorage.end(); ++itr)
     {
+		CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
+
         CurrencyTypesEntry const* entry = sCurrencyTypesStore.LookupEntry(itr->first);
         if (!entry) // should never happen
             continue;
@@ -7394,14 +7396,14 @@ void Player::_SaveCurrency(SQLTransaction& trans)
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_PLAYER_CURRENCY);
                 stmt->setUInt32(0, GetGUIDLow());
                 stmt->setUInt16(1, itr->first);
-                stmt->setUInt32(2, itr->second.weekCount);
-                stmt->setUInt32(3, itr->second.totalCount);
+                stmt->setUInt32(2, (itr->second.weekCount / 100));
+                stmt->setUInt32(3, (itr->second.totalCount / 100));
                 trans->Append(stmt);
                 break;
             case PLAYERCURRENCY_CHANGED:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PLAYER_CURRENCY);
-                stmt->setUInt32(0, itr->second.weekCount);
-                stmt->setUInt32(1, itr->second.totalCount);
+                stmt->setUInt32(0, (itr->second.weekCount / 100));
+                stmt->setUInt32(1, (itr->second.totalCount / 100));
                 stmt->setUInt32(2, GetGUIDLow());
                 stmt->setUInt16(3, itr->first);
                 trans->Append(stmt);
@@ -7523,10 +7525,6 @@ uint32 Player::GetCurrency(uint32 id, bool precision) const
     CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
     ASSERT(currency);
 
-
-			
-  if (currency->Category == 392 || currency->Category == 390 || currency->Category == 484) // Hack 
-	 return itr->second.totalCount / 100;
 
     int32 mod = currency->Flags & CURRENCY_FLAG_HIGH_PRECISION ? 100 : 1;
     return itr->second.totalCount / mod;

@@ -576,24 +576,24 @@ void Pet::Update(uint32 diff)
             }
 
            //regenerate focus for hunter pets or energy for deathknight's ghoul
-            if (_regenTimer)
+            if (m_regenTimer)
             {
-                if (_regenTimer > diff)
-                    _regenTimer -= diff;
+                if (m_regenTimer > diff)
+                    m_regenTimer -= diff;
                 else
                 {
                     switch (getPowerType())
                     {
                         case POWER_FOCUS:
                             Regenerate(POWER_FOCUS);
-                            _regenTimer += PET_FOCUS_REGEN_INTERVAL - diff;
-                            if (!_regenTimer)
-                                ++_regenTimer;
+                            m_regenTimer += PET_FOCUS_REGEN_INTERVAL - diff;
+                            if (!m_regenTimer)
+                                ++m_regenTimer;
 
                             // MrSmite
                             //  Fix for focus regen getting stuck
-                            if (_regenTimer > PET_FOCUS_REGEN_INTERVAL)
-                                _regenTimer = PET_FOCUS_REGEN_INTERVAL;
+                            if (m_regenTimer > PET_FOCUS_REGEN_INTERVAL)
+                                m_regenTimer = PET_FOCUS_REGEN_INTERVAL;
                             break;
                         // in creature::update
                         //case POWER_ENERGY:
@@ -602,7 +602,7 @@ void Pet::Update(uint32 diff)
                         //    if (!_regenTimer) ++_regenTimer;
                         //    break;
                         default:
-                            _regenTimer = 0;
+                           m_regenTimer = 0;
                             break;
                     }
                 }
@@ -610,14 +610,6 @@ void Pet::Update(uint32 diff)
 
             if (getPetType() != HUNTER_PET)
                 break;
-
-            if (m_happinessTimer <= diff)
-            {
-                LoseHappiness();
-                m_happinessTimer = 7500;
-            }
-            else
-                m_happinessTimer -= diff;
 
             break;
         }

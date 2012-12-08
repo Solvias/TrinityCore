@@ -3836,30 +3836,34 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                         if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
                             totalDamagePercentMod *= 1.5f;
             }
+            // Mutilate (for each hand)
+            else if (m_spellInfo->SpellFamilyFlags[1] & 0x6)
+            {
+                bool found = false;
+                // fast check
+                if (unitTarget->HasAuraState(AURA_STATE_DEADLY_POISON, m_spellInfo, m_caster))
+                    found = true;
+                // full aura scan
+                else
+                {
+                    Unit::AuraApplicationMap const& auras = unitTarget->GetAppliedAuras();
+                    for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+                    {
+                        if (itr->second->GetBase()->GetSpellInfo()->Dispel == DISPEL_POISON)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (found)
+                    totalDamagePercentMod *= 1.2f;          // 120% if poisoned
+            }
             break;
         }
         case SPELLFAMILY_SHAMAN:
         {
-          switch (m_spellInfo->Id)
-           {
-              case 2484:  //Earth Grasp
-              {
-                if (m_caster->HasAura(51485))
-				   {
-                     spell_id = 64695;
-                        m_caster->CastSpell(m_caster, 64695, true);
-				   }
-
-				if (m_caster->HasAura(51483)){
-                    if (roll_chance_i(50))
-					{
-                       spell_id = 64695;
-                        m_caster->CastSpell(m_caster, 64695, true);
-					}
-				}
-				break;
-              }
-           }
             // Skyshatter Harness item set bonus
             // Stormstrike
             if (AuraEffect* aurEff = m_caster->IsScriptOverriden(m_spellInfo, 5634))
@@ -4290,6 +4294,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     }
                     return;
                 }
+
                 // Glyph of Scourge Strike
                 case 69961:
                 {

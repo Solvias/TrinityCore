@@ -786,7 +786,7 @@ public:
                 //stand up
                 me->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_STAND);
 
-                Talk(SAY_DOC);
+                Talk(RAND(SAY_DOC1, SAY_DOC2, SAY_DOC3));
 
                 uint32 mobId = me->GetEntry();
                 me->SetWalk(false);

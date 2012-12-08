@@ -7364,11 +7364,7 @@ void Player::_LoadCurrency(PreparedQueryResult result)
         cur.weekCount = fields[1].GetUInt32();
         cur.totalCount = fields[2].GetUInt32();
 
-      /*		if (currency->Category == 392 || currency->Category == 390 || currency->Category == 484) // Hack (Honor)
-	        {
-			cur.totalCount /= 100;
-			cur.weekCount /= 100;
-			}*/
+    
 
         _currencyStorage.insert(PlayerCurrenciesMap::value_type(currencyID, cur));
 
@@ -7400,11 +7396,6 @@ void Player::_SaveCurrency(SQLTransaction& trans)
                 stmt->setUInt16(1, itr->first);
                 stmt->setUInt32(2, itr->second.weekCount);
                 stmt->setUInt32(3, itr->second.totalCount);
-				if (entry->Category == 392 || entry->Category == 390 || entry->Category == 484) // Hack
-				{
-		     	itr->second.totalCount /= 100;
-			     itr->second.weekCount /= 100;
-				}
                 trans->Append(stmt);
                 break;
             case PLAYERCURRENCY_CHANGED:
@@ -7413,11 +7404,6 @@ void Player::_SaveCurrency(SQLTransaction& trans)
                 stmt->setUInt32(1, itr->second.totalCount);
                 stmt->setUInt32(2, GetGUIDLow());
                 stmt->setUInt16(3, itr->first);
-				if (entry->Category == 392 || entry->Category == 390 || entry->Category == 484) // Hack
-				{
-		     	itr->second.totalCount /= 100;
-			     itr->second.weekCount /= 100;
-				}
                 trans->Append(stmt);
                 break;
             default:
@@ -7536,6 +7522,11 @@ uint32 Player::GetCurrency(uint32 id, bool precision) const
 
     CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
     ASSERT(currency);
+
+
+			
+  if (currency->Category == 392 || currency->Category == 390 || currency->Category == 484) // Hack 
+	 return itr->second.totalCount / 100;
 
     int32 mod = currency->Flags & CURRENCY_FLAG_HIGH_PRECISION ? 100 : 1;
     return itr->second.totalCount / mod;

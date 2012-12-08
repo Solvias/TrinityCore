@@ -1201,18 +1201,16 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     switch(m_caster->GetPower(POWER_HOLY_POWER))
                     {
                         case 0:
-                            damage = int32(damage * 0.39f);
+                            damage = int32((damage * 1.00f) *0.39);
                             break;
                         case 1: 
-                            damage = int32(damage * 1.17f);
+                            damage = int32((damage * 1.00f) *1.17);
                             break;
                         case 2: 
-                            damage = int32(damage * 3.31);
+                            damage = int32((damage * 1.00f) *3.06);
                             break;
                     }
                 }
-
-
              break;
             }
             case SPELLFAMILY_DEATHKNIGHT:
@@ -1900,9 +1898,6 @@ void Spell::EffectApplyAura(SpellEffIndex effIndex)
         case 38177:  // Blackwhelp Net
             if (unitTarget->GetEntry() != 21387)
                 return;
-  /*      case 85673:  // Word of Glory
-            if (!m_caster->HasAura(93466))
-                return;*/
     }
 
     ASSERT(unitTarget == m_spellAura->GetOwner());

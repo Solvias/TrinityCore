@@ -161,20 +161,17 @@ class spell_sha_earthbind_totem : public SpellScriptLoader
             }
             void Apply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-                if (!GetCaster())
-                    return;
                 Player* owner = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
-                if (!owner)
-                    return;
+
                 // Earth's Grasp
                 if (GetCaster()->HasAura(51483))
                 {
                     if (roll_chance_i(50))
                         GetCaster()->CastSpell(GetCaster(), EARTHBIND_TOTEM_SPELL_EARTHGRAB, true);
                 }
-			    else if (GetCaster()->HasAura(51485))
+
+			    if (GetCaster()->HasAura(51485))
                 {
-                    if (roll_chance_i(100))
                         GetCaster()->CastSpell(GetCaster(), EARTHBIND_TOTEM_SPELL_EARTHGRAB, true);
                 }
             }

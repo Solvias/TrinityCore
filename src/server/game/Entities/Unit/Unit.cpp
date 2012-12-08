@@ -6523,8 +6523,11 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 break;
             }
            // Light's Beacon - Beacon of Light
+			
             if (dummySpell->Id == 53651)
             {
+				Unit* beaconTarget = NULL;
+				beaconTarget = triggeredByAura->GetBase()->GetCaster();
                 // Get target of beacon of light
                 if (Unit* beaconTarget = triggeredByAura->GetBase()->GetCaster())
                 {
@@ -6542,9 +6545,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         }
                     }
                 }
-                return false;
-            }
-
                 if (triggered_spell_id && beaconTarget)
                 {
                     int32 percent = 0;
@@ -7047,6 +7047,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!roll_chance_f(chance))
                         return false;
 
+					CastSpell(this, 64695, true);
                     triggered_spell_id = 64695;
                 break;
 				}

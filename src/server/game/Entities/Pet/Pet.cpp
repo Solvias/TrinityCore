@@ -575,38 +575,50 @@ void Pet::Update(uint32 diff)
                 }
             }
 
-            //regenerate focus for hunter pets or energy for deathknight's ghoul
-            if (m_regenTimer)
+           //regenerate focus for hunter pets or energy for deathknight's ghoul
+            if (_regenTimer)
             {
-                if (m_regenTimer > diff)
-                    m_regenTimer -= diff;
+                if (_regenTimer > diff)
+                    _regenTimer -= diff;
                 else
                 {
                     switch (getPowerType())
                     {
                         case POWER_FOCUS:
                             Regenerate(POWER_FOCUS);
-                            m_regenTimer += PET_FOCUS_REGEN_INTERVAL - diff;
-                            if (!m_regenTimer) ++m_regenTimer;
+                            _regenTimer += PET_FOCUS_REGEN_INTERVAL - diff;
+                            if (!_regenTimer)
+                                ++_regenTimer;
 
-                            // Reset if large diff (lag) causes focus to get 'stuck'
-                            if (m_regenTimer > PET_FOCUS_REGEN_INTERVAL)
-                                m_regenTimer = PET_FOCUS_REGEN_INTERVAL;
-
+                            // MrSmite
+                            //  Fix for focus regen getting stuck
+                            if (_regenTimer > PET_FOCUS_REGEN_INTERVAL)
+                                _regenTimer = PET_FOCUS_REGEN_INTERVAL;
                             break;
-
                         // in creature::update
                         //case POWER_ENERGY:
                         //    Regenerate(POWER_ENERGY);
-                        //    m_regenTimer += CREATURE_REGEN_INTERVAL - diff;
-                        //    if (!m_regenTimer) ++m_regenTimer;
+                        //    _regenTimer += CREATURE_REGEN_INTERVAL - diff;
+                        //    if (!_regenTimer) ++_regenTimer;
                         //    break;
                         default:
-                            m_regenTimer = 0;
+                            _regenTimer = 0;
                             break;
                     }
                 }
             }
+
+            if (getPetType() != HUNTER_PET)
+                break;
+
+            if (m_happinessTimer <= diff)
+            {
+                LoseHappiness();
+                m_happinessTimer = 7500;
+            }
+            else
+                m_happinessTimer -= diff;
+
             break;
         }
         default:
@@ -614,6 +626,7 @@ void Pet::Update(uint32 diff)
     }
     Creature::Update(diff);
 }
+
 
 void Creature::Regenerate(Powers power)
 {
@@ -2006,8 +2019,8 @@ void Pet::SynchronizeLevelWithOwner()
         case HUNTER_PET:
             if (getLevel() > owner->getLevel())
                 GivePetLevel(owner->getLevel());
-            else if (getLevel() + 5 < owner->getLevel())
-                GivePetLevel(owner->getLevel() - 5);
+            else if (getLevel() + 3 < owner->getLevel())
+                GivePetLevel(owner->getLevel() - 3);
             break;
         default:
             break;

@@ -315,10 +315,11 @@ public:
 # npc_chicken_cluck
 #########*/
 
-enum Cluck
+enum ChickenCluck
 {
-    EMOTE_HELLO         = -1070004,
-    EMOTE_CLUCK_TEXT    = -1070006,
+    EMOTE_HELLO_A       = 0,
+    EMOTE_HELLO_H       = 1,
+    EMOTE_CLUCK_TEXT    = 2,
 
     QUEST_CLUCK         = 3861,
     FACTION_FRIENDLY    = 35,
@@ -372,7 +373,7 @@ public:
                     {
                         me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                         me->setFaction(FACTION_FRIENDLY);
-                        DoScriptText(EMOTE_HELLO, me);
+                        Talk(player->GetTeam() == HORDE ? EMOTE_HELLO_H : EMOTE_HELLO_A);
                     }
                     break;
                 case TEXT_EMOTE_CHEER:
@@ -380,7 +381,7 @@ public:
                     {
                         me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                         me->setFaction(FACTION_FRIENDLY);
-                        DoScriptText(EMOTE_CLUCK_TEXT, me);
+                        Talk(EMOTE_CLUCK_TEXT);
                     }
                     break;
             }
@@ -785,7 +786,7 @@ public:
                 //stand up
                 me->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_STAND);
 
-                DoScriptText(RAND(SAY_DOC1, SAY_DOC2, SAY_DOC3), me);
+                Talk(SAY_DOC);
 
                 uint32 mobId = me->GetEntry();
                 me->SetWalk(false);
@@ -908,18 +909,10 @@ enum Garments
     ENTRY_KORJA             = 12430,
     ENTRY_DG_KEL            = 12428,
 
-    //used by 12429, 12423, 12427, 12430, 12428, but signed for 12429
-    SAY_COMMON_HEALED       = -1000164,
-    SAY_DG_KEL_THANKS       = -1000165,
-    SAY_DG_KEL_GOODBYE      = -1000166,
-    SAY_ROBERTS_THANKS      = -1000167,
-    SAY_ROBERTS_GOODBYE     = -1000168,
-    SAY_KORJA_THANKS        = -1000169,
-    SAY_KORJA_GOODBYE       = -1000170,
-    SAY_DOLF_THANKS         = -1000171,
-    SAY_DOLF_GOODBYE        = -1000172,
-    SAY_SHAYA_THANKS        = -1000173,
-    SAY_SHAYA_GOODBYE       = -1000174, //signed for 21469
+    // used by 12429, 12423, 12427, 12430, 12428, but signed for 12429
+    SAY_THANKS              = 0,
+    SAY_GOODBYE             = 1,
+    SAY_HEALED              = 2,
 };
 
 class npc_garments_of_quests : public CreatureScript
@@ -929,7 +922,10 @@ public:
 
     struct npc_garments_of_questsAI : public npc_escortAI
     {
-        npc_garments_of_questsAI(Creature* creature) : npc_escortAI(creature) { Reset(); }
+        npc_garments_of_questsAI(Creature* creature) : npc_escortAI(creature) 
+        {
+            Reset();
+        }
 
         uint64 CasterGUID;
 
@@ -948,15 +944,15 @@ public:
             RunAwayTimer = 5000;
 
             me->SetStandState(UNIT_STAND_STATE_KNEEL);
-            //expect database to have RegenHealth=0
+            // expect database to have RegenHealth=0
             me->SetHealth(me->CountPctFromMaxHealth(70));
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) { }
 
-        void SpellHit(Unit* caster, SpellInfo const* Spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell)
         {
-            if (Spell->Id == SPELL_LESSER_HEAL_R2 || Spell->Id == SPELL_FORTITUDE_R1)
+            if (spell->Id == SPELL_LESSER_HEAL_R2 || spell->Id == SPELL_FORTITUDE_R1)
             {
                 //not while in combat
                 if (me->isInCombat())
@@ -973,16 +969,16 @@ public:
                         case ENTRY_SHAYA:
                             if (player->GetQuestStatus(QUEST_MOON) == QUEST_STATUS_INCOMPLETE)
                             {
-                                if (IsHealed && !CanRun && Spell->Id == SPELL_FORTITUDE_R1)
+                                if (IsHealed && !CanRun && spell->Id == SPELL_FORTITUDE_R1)
                                 {
-                                    DoScriptText(SAY_SHAYA_THANKS, me, caster);
+                                    Talk(SAY_THANKS, caster->GetGUID());
                                     CanRun = true;
                                 }
-                                else if (!IsHealed && Spell->Id == SPELL_LESSER_HEAL_R2)
+                                else if (!IsHealed && spell->Id == SPELL_LESSER_HEAL_R2)
                                 {
                                     CasterGUID = caster->GetGUID();
                                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                                    DoScriptText(SAY_COMMON_HEALED, me, caster);
+                                    Talk(SAY_HEALED, caster->GetGUID());
                                     IsHealed = true;
                                 }
                             }
@@ -990,16 +986,16 @@ public:
                         case ENTRY_ROBERTS:
                             if (player->GetQuestStatus(QUEST_LIGHT_1) == QUEST_STATUS_INCOMPLETE)
                             {
-                                if (IsHealed && !CanRun && Spell->Id == SPELL_FORTITUDE_R1)
+                                if (IsHealed && !CanRun && spell->Id == SPELL_FORTITUDE_R1)
                                 {
-                                    DoScriptText(SAY_ROBERTS_THANKS, me, caster);
+                                    Talk(SAY_THANKS, caster->GetGUID());
                                     CanRun = true;
                                 }
-                                else if (!IsHealed && Spell->Id == SPELL_LESSER_HEAL_R2)
+                                else if (!IsHealed && spell->Id == SPELL_LESSER_HEAL_R2)
                                 {
                                     CasterGUID = caster->GetGUID();
                                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                                    DoScriptText(SAY_COMMON_HEALED, me, caster);
+                                    Talk(SAY_HEALED, caster->GetGUID());
                                     IsHealed = true;
                                 }
                             }
@@ -1007,16 +1003,16 @@ public:
                         case ENTRY_DOLF:
                             if (player->GetQuestStatus(QUEST_LIGHT_2) == QUEST_STATUS_INCOMPLETE)
                             {
-                                if (IsHealed && !CanRun && Spell->Id == SPELL_FORTITUDE_R1)
+                                if (IsHealed && !CanRun && spell->Id == SPELL_FORTITUDE_R1)
                                 {
-                                    DoScriptText(SAY_DOLF_THANKS, me, caster);
+                                    Talk(SAY_THANKS, caster->GetGUID());
                                     CanRun = true;
                                 }
-                                else if (!IsHealed && Spell->Id == SPELL_LESSER_HEAL_R2)
+                                else if (!IsHealed && spell->Id == SPELL_LESSER_HEAL_R2)
                                 {
                                     CasterGUID = caster->GetGUID();
                                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                                    DoScriptText(SAY_COMMON_HEALED, me, caster);
+                                    Talk(SAY_HEALED, caster->GetGUID());
                                     IsHealed = true;
                                 }
                             }
@@ -1024,16 +1020,16 @@ public:
                         case ENTRY_KORJA:
                             if (player->GetQuestStatus(QUEST_SPIRIT) == QUEST_STATUS_INCOMPLETE)
                             {
-                                if (IsHealed && !CanRun && Spell->Id == SPELL_FORTITUDE_R1)
+                                if (IsHealed && !CanRun && spell->Id == SPELL_FORTITUDE_R1)
                                 {
-                                    DoScriptText(SAY_KORJA_THANKS, me, caster);
+                                    Talk(SAY_THANKS, caster->GetGUID());
                                     CanRun = true;
                                 }
-                                else if (!IsHealed && Spell->Id == SPELL_LESSER_HEAL_R2)
+                                else if (!IsHealed && spell->Id == SPELL_LESSER_HEAL_R2)
                                 {
                                     CasterGUID = caster->GetGUID();
                                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                                    DoScriptText(SAY_COMMON_HEALED, me, caster);
+                                    Talk(SAY_HEALED, caster->GetGUID());
                                     IsHealed = true;
                                 }
                             }
@@ -1041,23 +1037,23 @@ public:
                         case ENTRY_DG_KEL:
                             if (player->GetQuestStatus(QUEST_DARKNESS) == QUEST_STATUS_INCOMPLETE)
                             {
-                                if (IsHealed && !CanRun && Spell->Id == SPELL_FORTITUDE_R1)
+                                if (IsHealed && !CanRun && spell->Id == SPELL_FORTITUDE_R1)
                                 {
-                                    DoScriptText(SAY_DG_KEL_THANKS, me, caster);
+                                    Talk(SAY_THANKS, caster->GetGUID());
                                     CanRun = true;
                                 }
-                                else if (!IsHealed && Spell->Id == SPELL_LESSER_HEAL_R2)
+                                else if (!IsHealed && spell->Id == SPELL_LESSER_HEAL_R2)
                                 {
                                     CasterGUID = caster->GetGUID();
                                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                                    DoScriptText(SAY_COMMON_HEALED, me, caster);
+                                    Talk(SAY_HEALED, caster->GetGUID());
                                     IsHealed = true;
                                 }
                             }
                             break;
                     }
 
-                    //give quest credit, not expect any special quest objectives
+                    // give quest credit, not expect any special quest objectives
                     if (CanRun)
                         player->TalkedToCreature(me->GetEntry(), me->GetGUID());
                 }
@@ -1079,19 +1075,19 @@ public:
                         switch (me->GetEntry())
                         {
                             case ENTRY_SHAYA:
-                                DoScriptText(SAY_SHAYA_GOODBYE, me, unit);
+                                Talk(SAY_GOODBYE, unit->GetGUID());
                                 break;
                             case ENTRY_ROBERTS:
-                                DoScriptText(SAY_ROBERTS_GOODBYE, me, unit);
+                                Talk(SAY_GOODBYE, unit->GetGUID());
                                 break;
                             case ENTRY_DOLF:
-                                DoScriptText(SAY_DOLF_GOODBYE, me, unit);
+                                Talk(SAY_GOODBYE, unit->GetGUID());
                                 break;
                             case ENTRY_KORJA:
-                                DoScriptText(SAY_KORJA_GOODBYE, me, unit);
+                                Talk(SAY_GOODBYE, unit->GetGUID());
                                 break;
                             case ENTRY_DG_KEL:
-                                DoScriptText(SAY_DG_KEL_GOODBYE, me, unit);
+                                Talk(SAY_GOODBYE, unit->GetGUID());
                                 break;
                         }
 

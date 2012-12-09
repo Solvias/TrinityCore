@@ -5565,22 +5565,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             break;
         }
-        case SPELLFAMILY_SHAMAN:
-        {
-            switch (dummySpell->Id)
-            {
-                // Grounding Totem
-                case 8178:
-                {
-                    *handled = true;
-                    // uncomment it when we will implement proc from taken non-damaging spells
-                    /*if (victim != this)
-                        return true;*/
-                    break;
-                }
-            }
-            break;
-        }
         case SPELLFAMILY_MAGE:
         {
             // Magic Absorption
@@ -7531,6 +7515,20 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 /*damage*/, Aura* triggeredByAura
             }
             break;
         }
+		case SPELLFAMILY_SHAMAN:
+		    switch (dummySpell->Id)
+            {
+				// Grounding Totem
+                case 8178:
+                {
+                    *handled = true;
+                    // uncomment it when we will implement proc from taken non-damaging spells
+                    /*if (victim != this)
+                        return true;*/
+                    break;
+                }
+			}
+		break;
         case SPELLFAMILY_MAGE:
         {
             switch (dummySpell->Id)

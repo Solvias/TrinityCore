@@ -3796,7 +3796,6 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                     fixed_bonus += (aur->GetStackAmount() - 1) * CalculateDamage(2, unitTarget);
                 }
             }
-            break;
         }
 		case SPELLFAMILY_PALADIN:
         {
@@ -3878,13 +3877,22 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 if (m_caster->GetTypeId() == TYPEID_PLAYER)
                     m_caster->ToPlayer()->AddComboPoints(unitTarget, 1, this);
             }
-            // Shred, Maul - Rend and Tear
-            else if (m_spellInfo->SpellFamilyFlags[0] & 0x00008800 && unitTarget->HasAuraState(AURA_STATE_BLEEDING) || unitTarget->HasAura(772) || unitTarget->HasAura(94009))
-            {
-                if (AuraEffect const* rendAndTear = m_caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 2859, 0))
+			 if (m_spellInfo->Id == 80313) // Pulverize
+                {
+                 if (Aura* lacer = unitTarget->GetAura(33745)) // Lacerate
+                 {
+                     int32 bp = ((m_spellInfo->Effects[2].BasePoints * m_spellInfo->Effects[0].BasePoints / 100) * lacer->GetStackAmount()) / 100;
+                     m_caster->CastCustomSpell(unitTarget, 31756, &bp, NULL, NULL, true);
+                     unitTarget->RemoveAurasDueToSpell(33745);
+                 }
+             }
+             // Shred, Maul - Rend and Tear
+             else if (m_spellInfo->SpellFamilyFlags[0] & 0x00008800 && unitTarget->HasAuraState(AURA_STATE_BLEEDING))
+             {
+                 if (AuraEffect const* rendAndTear = m_caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 2859, 0))
                     totalDamagePercentMod *= float((rendAndTear->GetAmount() + 100.0f) / 100.0f);
-            }
             break;
+           }
         }
         case SPELLFAMILY_HUNTER:
         {
@@ -3930,20 +3938,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             }
         case SPELLFAMILY_DEATHKNIGHT:
         {
-
-           // Death strike
-            if (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_DK_DEATH_STRIKE)
-            {
-                     bp = m_caster->CountPctFromMaxHealth(7);
-                // Improved Death Strike
-                if (AuraEffect const* aurEff = m_caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 2751, 0))
-                    AddPct(bp, m_caster->CalculateSpellDamage(m_caster, aurEff->GetSpellInfo(), 2));
-
-                // Glyph of Dark Succor
-                if (AuraEffect const* aurEff = m_caster->GetAuraEffect(96279, 0))
-                    if (bp < int32(m_caster->CountPctFromMaxHealth(aurEff->GetAmount())))
-                        if (m_caster->HasAura(48265) || m_caster->HasAura(48266)) // Only in frost/unholy presence
-                            bp = m_caster->CountPctFromMaxHealth(aurEff->GetAmount());
+  
             // Blood Strike
             if (m_spellInfo->SpellFamilyFlags[0] & 0x400000)
             {
@@ -3991,10 +3986,6 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                        m_caster->CastCustomSpell(m_caster, 77535, &shield, NULL, NULL, false);
                    }
                }
-
-                m_caster->CastCustomSpell(m_caster, 45470, &bp, NULL, NULL, false);
-                return;
-			}
 			// Death Coil
 			if (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_DK_DEATH_COIL)
 			{

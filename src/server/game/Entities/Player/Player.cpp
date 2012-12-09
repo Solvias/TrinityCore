@@ -7281,6 +7281,7 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
 		{
 			honor_f = 0;
 		}
+		honor_f /= 10; // Fix Visual Honor
     }
 
     if (victim != NULL)
@@ -7395,14 +7396,14 @@ void Player::_SaveCurrency(SQLTransaction& trans)
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_PLAYER_CURRENCY);
                 stmt->setUInt32(0, GetGUIDLow());
                 stmt->setUInt16(1, itr->first);
-                stmt->setUInt32(2, (itr->second.weekCount / 100));
-                stmt->setUInt32(3, (itr->second.totalCount / 100));
+                stmt->setUInt32(2, (itr->second.weekCount));
+                stmt->setUInt32(3, (itr->second.totalCount));
                 trans->Append(stmt);
                 break;
             case PLAYERCURRENCY_CHANGED:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PLAYER_CURRENCY);
-                stmt->setUInt32(0, (itr->second.weekCount / 100));
-                stmt->setUInt32(1, (itr->second.totalCount / 100));
+                stmt->setUInt32(0, (itr->second.weekCount));
+                stmt->setUInt32(1, (itr->second.totalCount));
                 stmt->setUInt32(2, GetGUIDLow());
                 stmt->setUInt16(3, itr->first);
                 trans->Append(stmt);
@@ -7650,10 +7651,10 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
 
             // if hasSeasonCount packet << uint32(seasontotalearned); TODO: save this in character DB and use it
 
-            packet << uint32(newTotalCount / precision);
+            packet << uint32(newTotalCount);
             packet << uint32(id);
             if (weekCap)
-                packet << uint32(newWeekCount / precision);
+                packet << uint32(newWeekCount);
 
             GetSession()->SendPacket(&packet);
         }

@@ -644,7 +644,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 int32 mws = caster->GetAttackTime(BASE_ATTACK);
                 float mwb_min = caster->GetWeaponDamageRange(BASE_ATTACK, MINDAMAGE);
                 float mwb_max = caster->GetWeaponDamageRange(BASE_ATTACK, MAXDAMAGE);
-                float mwb = ((mwb_min + mwb_max) / 2 + ap * mws / 14000) * 0.25f * 6.0f;
+                float mwb = (((mwb_min + mwb_max) / 2 + ap * mws / 14000) * 0.25f * 6.0f) / 10;
                 amount += int32(caster->ApplyEffectModifiers(m_spellInfo, m_effIndex, mwb));
             }
             break;
@@ -5062,6 +5062,19 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             break;
                     }
                     break;
+				case SPELLFAMILY_SHAMAN:
+				switch (GetId())
+				{
+				   case 2484: //Earth Grasp
+                   {
+                    if (caster->HasAura(51483)) 
+                        caster->CastSpell(caster, 64695, true);
+                    if (caster->HasAura(51485))
+                        caster->CastSpell(caster, 64695, true);
+                      break;
+                   }
+				}
+				break;
                 case SPELLFAMILY_DEATHKNIGHT:
                     // Summon Gargoyle (Dismiss Gargoyle at remove)
                     if (GetId() == 61777)

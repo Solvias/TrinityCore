@@ -168,21 +168,20 @@ public:
                 Player* owner = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
                 if (!owner)
                     return;
-                // Earth's Grasp
+                // Earth's Grasp STILL BUGGED
                 if (AuraEffect* aurEff = owner->GetAuraEffectOfRankedSpell(SHAMAN_SPELL_EARTH_GRASP_R1, EFFECT_0))
                 {
                     if (roll_chance_i(aurEff->GetAmount()))
-                        GetCaster()->CastSpell(GetCaster(), EARTHBIND_TOTEM_SPELL_EARTHGRAB, false);
+                        owner->CastSpell(owner, EARTHBIND_TOTEM_SPELL_EARTHGRAB, true, NULL, aurEff);
                 }
-				// Earth's Grasp
-                if (AuraEffect* aurEff = owner->GetAuraEffectOfRankedSpell(SHAMAN_SPELL_EARTH_GRASP_R2, EFFECT_0))
-                        GetCaster()->CastSpell(GetCaster(), EARTHBIND_TOTEM_SPELL_EARTHGRAB, false);
+                else if (AuraEffect* aurEff = owner->GetAuraEffectOfRankedSpell(SHAMAN_SPELL_EARTH_GRASP_R2, EFFECT_0))
+                        owner->CastSpell(owner, EARTHBIND_TOTEM_SPELL_EARTHGRAB, true, NULL, aurEff); 
             }
 
         void Register()
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_sha_earthbind_totem_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-			OnEffectApply += AuraEffectApplyFn(spell_sha_earthbind_totem_AuraScript::Apply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+	      OnEffectApply += AuraEffectApplyFn(spell_sha_earthbind_totem_AuraScript::Apply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
@@ -565,9 +564,9 @@ class spell_sha_totemic_wrath : public SpellScriptLoader
 public:
     spell_sha_totemic_wrath() : SpellScriptLoader("spell_sha_totemic_wrath") { }
 
-    class spell_sha_totemic_wrath_AuraScript : public AuraScript
+    class spell_sha_totemic_wrath_SpellScript : public SpellScript
     {
-        PrepareAuraScript(spell_sha_totemic_wrath_AuraScript); 
+        PrepareSpellScript(spell_sha_totemic_wrath_SpellScript); 
 
         bool Validate(SpellEntry const * /*spellEntry*/)
         {
@@ -577,27 +576,21 @@ public:
             return true;
         }
 
-        void HandleEffectApply(AuraEffect const * aurEff, AuraEffectHandleModes /*mode*/)
+        void HandleTotemicWrathScript(SpellEffIndex /*effIndex*/)
         {
-            Unit* target = GetTarget();
-            if(target->ToPlayer())
-                return; // just apply as dummy
-
-            // applied by a totem - cast the real aura if owner has the talent
-            if (Unit *caster = aurEff->GetBase()->GetCaster())
-                if (caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_GENERIC, 2019, 0))
-                    target->CastSpell(target, SHAMAN_SPELL_TOTEMIC_WRATH_BUFF, true, NULL, aurEff);
+            Unit* caster = GetCaster();
+            caster->CastSpell(caster, SHAMAN_SPELL_TOTEMIC_WRATH_BUFF, true);
         }
 
         void Register()
         {
-            OnEffectApply += AuraEffectApplyFn(spell_sha_totemic_wrath_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            OnEffectHit += SpellEffectFn(spell_sha_totemic_wrath_SpellScript::HandleTotemicWrathScript, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
         }
     };
 
-    AuraScript *GetAuraScript() const
+    SpellScript *GetSpellScript() const
     {
-        return new spell_sha_totemic_wrath_AuraScript();
+        return new spell_sha_totemic_wrath_SpellScript();
     }
 };
 

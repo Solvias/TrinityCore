@@ -7384,7 +7384,6 @@ void Player::_SaveCurrency(SQLTransaction& trans)
 
     for (PlayerCurrenciesMap::iterator itr = _currencyStorage.begin(); itr != _currencyStorage.end(); ++itr)
     {
-		CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
 
         CurrencyTypesEntry const* entry = sCurrencyTypesStore.LookupEntry(itr->first);
         if (!entry) // should never happen

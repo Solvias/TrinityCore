@@ -7516,6 +7516,7 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 /*damage*/, Aura* triggeredByAura
             break;
         }
 		case SPELLFAMILY_SHAMAN:
+		{
 		    switch (dummySpell->Id)
             {
 				// Grounding Totem
@@ -7528,7 +7529,8 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 /*damage*/, Aura* triggeredByAura
                     break;
                 }
 			}
-		break;
+		   break;
+		}
         case SPELLFAMILY_MAGE:
         {
             switch (dummySpell->Id)

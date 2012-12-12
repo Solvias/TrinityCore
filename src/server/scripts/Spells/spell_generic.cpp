@@ -3454,11 +3454,11 @@ class spell_gen_enable_mastery : public SpellScriptLoader
                 // learn all mastery spells, and only set active the ones that are for current spec
                 uint32 const* talentTabs = GetTalentTabPages(target->getClass());
                 uint32 currentSpec = target->GetActiveSpec();
-               for (uint32 i = 0; i < MAX_TALENT_TABS; ++i)
+            /*   for (uint32 i = 0; i < MAX_TALENT_TABS; ++i)
                    if (TalentTabEntry const* talentTab = sTalentTabStore.LookupEntry(talentTabs[i]))
                         for (uint32 i = 0; i < MAX_MASTERY_SPELLS; ++i)
                             if (uint32 mastery = talentTab->spellIds[i])
-                                 target->addSpell(mastery, currentSpec == talentTabs[i], false, false, currentSpec != talentTabs[i]);
+                                 target->addSpell(mastery, currentSpec == talentTabs[i], false, false, currentSpec != talentTabs[i]); */
 
                 target->SetMasteryState(true);
             }

@@ -6794,12 +6794,14 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 87168:
                 case 87172:
                 {
-                    if (roll_chance_f(triggerAmount) && !this->IsWithinDistInMap(victim, 15.0f))
-                    {
-                        target = this;
+                    if (this->IsWithinDistInMap(victim, 15.0f))
+                      return false;
+					else 
+					{
+					    target = this;
                         triggered_spell_id = 87173;
                         break;
-                    }
+					}
                 }
                 // Divine purpose
                 case 85117:

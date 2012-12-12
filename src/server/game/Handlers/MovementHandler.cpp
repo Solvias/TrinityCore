@@ -400,7 +400,20 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
         plrMover->UpdateFallInformationIfNeed(movementInfo, opcode);
 
         AreaTableEntry const* zone = GetAreaEntryByAreaID(plrMover->GetAreaId());
-        float depth = zone ? zone->MaxDepth : -500.0f;
+        float underMapValueZ;
+
+       switch (plrMover->GetMapId())	
+        {
+            case 617: underMapValueZ = 3.0f; break; // Dalaran Sewers
+            case 618: underMapValueZ = 28.0f; break; // Ring of Valor
+            case 562: underMapValueZ = -34.0f; break; // Blade Edge Arena
+            case 559: underMapValueZ = -24.0f; break; // Nagrand arena
+            case 572: underMapValueZ = 28.0f; break; // Lordearon
+            case 571: underMapValueZ = -400.0f; break; // Northrend
+
+            default: underMapValueZ = zone ? zone->MaxDepth : -500.0f; break;
+        }
+
         if (movementInfo.pos.GetPositionZ() < depth)
         {
             if (!(plrMover->GetBattleground() && plrMover->GetBattleground()->HandlePlayerUnderMap(_player)))

@@ -5900,12 +5900,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     triggered_spell_id = 63311;
                     break;
                 }
-                // Glyph of Shadowflame
-                case 63310:
-                {
-                    triggered_spell_id = 63311;
-                    break;
-                }
                 // Nightfall
                 case 18094:
                 case 18095:
@@ -6620,7 +6614,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     {
                         if (beaconTarget->IsWithinLOSInMap(victim))
                         {
-						int32 percent = 0;
+				    int32 percent = 0;
                         switch (procSpell->Id)
                         {
                         case 85673: // Word of Glory
@@ -6633,17 +6627,20 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         case 635:   // Holy Light
                             percent = triggerAmount * 2; // 100% heal from Holy Light
                             break;
+                        break;
                         }
-                    basepoints0 = CalculatePct(damage, percent);
-                    victim->CastCustomSpell(beaconTarget, triggered_spell_id, &basepoints0, NULL, NULL, true, 0, triggeredByAura);
-                    return true; 
 
-                            basepoints0 = damage;
+                        triggered_spell_id = 53652; 
+                        basepoints0 = CalculatePct(damage, percent);
+                        victim->CastCustomSpell(beaconTarget, triggered_spell_id, &basepoints0, NULL, NULL, true, 0, triggeredByAura);
+                        return true; 
+                       /*     basepoints0 = damage;
                             victim->CastCustomSpell(beaconTarget, 53652, &basepoints0, NULL, NULL, true);
-                            return true;
+                            return true; */
                         }
                     }
                 }
+               }
                /* if (triggered_spell_id && beaconTarget)
                 {
                     int32 percent = 0;
@@ -6665,7 +6662,25 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     return true;
                 }
 
-                return false;*/
+                return false;
+            }*/
+		  // Righteous Vengeance
+            if (dummySpell->SpellIconID == 3025)
+            {
+                // 4 damage tick
+                basepoints0 = triggerAmount * damage / 400;
+                triggered_spell_id = 61840;
+                // Add remaining ticks to damage done
+                basepoints0 += victim->GetRemainingPeriodicAmount(GetGUID(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE);
+                break;
+            }
+            // Sheath of Light
+            if (dummySpell->SpellIconID == 3030)
+            {
+                // 4 healing tick
+                basepoints0 = triggerAmount * damage / 400;
+                triggered_spell_id = 54203;
+                break;
             }
             // Judgements of the Wise
             if (dummySpell->SpellIconID == 3017)
@@ -6727,26 +6742,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     }
                     break;
                 }
-			  // Righteous Vengeance
-            if (dummySpell->SpellIconID == 3025)
-            {
-                // 4 damage tick
-                basepoints0 = triggerAmount * damage / 400;
-                triggered_spell_id = 61840;
-                // Add remaining ticks to damage done
-                basepoints0 += victim->GetRemainingPeriodicAmount(GetGUID(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE);
-                break;
-            }
-            // Sheath of Light
-            if (dummySpell->SpellIconID == 3030)
-            {
-                // 4 healing tick
-                basepoints0 = triggerAmount * damage / 400;
-                triggered_spell_id = 54203;
-                break;
-            }
-            switch (dummySpell->Id)
-            {
                 // Judgements of the Bold
                 case 89901:
                 {
@@ -6773,7 +6768,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                     break;
                 }
-				 // Ancient Healer
+		      // Ancient Healer
                 case 86674:
                 {
                     int32 bp0 = damage;
@@ -6962,7 +6957,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 {
                     // Totem itself must be a caster of this spell
                     Unit* caster = NULL;
-                    for (ControlList::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr) {
+                    for (ControlList::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr) 
+                   {
                         if ((*itr)->GetEntry() != 2630)
                             continue;
 

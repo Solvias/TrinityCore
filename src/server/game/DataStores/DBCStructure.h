@@ -2051,6 +2051,7 @@ struct SummonPropertiesEntry
 #define MAX_TALENT_RANK 5
 #define MAX_PET_TALENT_RANK 3                               // use in calculations, expected <= MAX_TALENT_RANK
 #define MAX_TALENT_TABS 3
+#define MAX_MASTERY_SPELLS 2
 
 struct TalentEntry
 {
@@ -2065,7 +2066,7 @@ struct TalentEntry
                                                             // 13-14 part of prev field
     //uint32  needAddInSpellBook;                           // 15       m_flags also need disable higest ranks on reset talent tree
     //uint32  unk2;                                         // 16       m_requiredSpellID
-    //uint64  allowForPet;                                  // 17       m_categoryMask its a 64 bit mask for pet 1<<m_categoryEnumID in CreatureFamily.dbc
+    //uint64  allowForPet;                                  // 17       m_categoryMask its a 64 bit mask for pet 1<<m_categoryEnumID in CreatureFamily.dbc   
 };
 
 struct TalentTabEntry
@@ -2079,7 +2080,7 @@ struct TalentTabEntry
     //char* internalname;                                   // 6        m_backgroundFile
     //char* description;                                    // 7
     //uint32 rolesMask;                                     // 8 4.0.0
-    //uint32 spellIds[2];                                   // 9-10 passive mastery bonus spells?
+     uint32 spellIds[2];                                   // 9-10 passive mastery bonus spells?
 };
 
 struct TalentTreePrimarySpellsEntry

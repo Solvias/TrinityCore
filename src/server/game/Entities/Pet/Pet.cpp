@@ -250,7 +250,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         uint32 savedhealth = fields[10].GetUInt32();
         uint32 savedmana = fields[11].GetUInt32();
         if ((!savedhealth && getPetType() == HUNTER_PET) || (savedhealth == 0 && getPetType() == HUNTER_PET)){ 
-            //setDeathState(JUST_DIED); 
+            setDeathState(DEAD); 
             savedhealth = 1; 
             SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth); 
             SetPower(POWER_MANA, savedmana > GetMaxPower(POWER_MANA) ? GetMaxPower(POWER_MANA) : savedmana); 
@@ -636,6 +636,8 @@ void Creature::Regenerate(Powers power)
         {
             // For hunter pets.
             addvalue = 24 * sWorld->getRate(RATE_POWER_FOCUS);
+			if (addvalue <= 0)
+				addvalue = 24;
             break;
         }
         case POWER_ENERGY:

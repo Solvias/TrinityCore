@@ -1454,11 +1454,12 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             {
                 if (!caster)
                     return;
-                                    // Sunfire talent
+                  // Sunfire talent
                 if (apply && caster->HasAura(93401))
-                    caster->CastSpell(caster,94338,true); // Moonfire swapper
+			          caster->RemoveAurasDueToSpell(94338);
+                  /*  caster->CastSpell(caster, 94338, true); // Moonfire swapper
                 else
-                    caster->RemoveAurasDueToSpell(94338);
+                    caster->RemoveAurasDueToSpell(94338); ITS TEMPOTARY */
             }
             // Enrage
             if ((GetSpellInfo()->SpellFamilyFlags[0] & 0x80000) && GetSpellInfo()->SpellIconID == 961)

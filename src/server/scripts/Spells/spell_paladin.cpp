@@ -693,16 +693,15 @@ class spell_pal_holy_wrath : public SpellScriptLoader
             SpellCastResult CheckCast()
             {
               if (Unit* target = GetExplTargetUnit())
-			  {
-              
-					if (target->GetCreatureType() != CREATURE_TYPE_UNDEAD || target->GetCreatureType() != CREATURE_TYPE_DEMON)     
-                           return SPELL_FAILED_BAD_TARGETS;
-
+             {
 					if (target->GetTypeId() == TYPEID_PLAYER)     
                            return SPELL_FAILED_BAD_TARGETS;
+					else
+                     return SPELL_CAST_OK;
 			  }
+			  else 
+			    return SPELL_CAST_OK;
 
-            return SPELL_CAST_OK;
            }
             void Register()
             {

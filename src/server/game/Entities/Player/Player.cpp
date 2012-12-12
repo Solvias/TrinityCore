@@ -5193,8 +5193,6 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     if (GetSession()->IsARecruiter() || (GetSession()->GetRecruiterId() != 0))
         SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_REFER_A_FRIEND);
 
-    setDeathState(ALIVE);
-
     SendMovementSetWaterWalking(false);
     SetRooted(false);
 
@@ -5225,6 +5223,8 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 
     // update visibility
     UpdateObjectVisibility();
+
+	setDeathState(ALIVE);
 
     if (!applySickness)
         return;
@@ -7396,14 +7396,14 @@ void Player::_SaveCurrency(SQLTransaction& trans)
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_PLAYER_CURRENCY);
                 stmt->setUInt32(0, GetGUIDLow());
                 stmt->setUInt16(1, itr->first);
-                stmt->setUInt32(2, (itr->second.weekCount));
-                stmt->setUInt32(3, (itr->second.totalCount));
+                stmt->setUInt32(2, (itr->second.weekCount) * 100); 
+                stmt->setUInt32(3, (itr->second.totalCount) * 100); 
                 trans->Append(stmt);
                 break;
             case PLAYERCURRENCY_CHANGED:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PLAYER_CURRENCY);
-                stmt->setUInt32(0, (itr->second.weekCount));
-                stmt->setUInt32(1, (itr->second.totalCount));
+                stmt->setUInt32(0, (itr->second.weekCount) * 100); 
+                stmt->setUInt32(1, (itr->second.totalCount) * 100); 
                 stmt->setUInt32(2, GetGUIDLow());
                 stmt->setUInt16(3, itr->first);
                 trans->Append(stmt);
@@ -7431,6 +7431,10 @@ void Player::SendNewCurrency(uint32 id) const
         return;
 
     uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
+
+        if (precision <= 1)
+            precision = 100;
+
     uint32 weekCount = itr->second.weekCount / precision;
     uint32 weekCap = _GetCurrencyWeekCap(entry) / precision;
 
@@ -7472,6 +7476,10 @@ void Player::SendCurrencies() const
             continue;
 
         uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
+
+        if (precision <= 1)
+            precision = 100;
+
         uint32 weekCount = itr->second.weekCount / precision;
         uint32 weekCap = _GetCurrencyWeekCap(entry) / precision;
 
@@ -8958,6 +8966,66 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
     }
 }
 
+// These spells arent passive, they must be cast asap after player login.
+void Player::CastMasterySpells(Player* caster)
+{
+    if (!caster)
+        return;
+
+    switch (caster->getClass())
+    {
+        case CLASS_WARRIOR:
+        {
+            caster->CastSpell(caster,87500,true);
+            break;
+        }
+        case CLASS_PALADIN:
+        {
+            caster->CastSpell(caster,87494,true);
+            break;
+        }
+        case CLASS_HUNTER:
+        {
+            caster->CastSpell(caster,87493,true);
+            break;
+        }
+        case CLASS_ROGUE:
+        {
+            caster->CastSpell(caster,87496,true);
+            break;
+        }
+        case CLASS_PRIEST:
+        {
+            caster->CastSpell(caster,87495,true);
+            break;
+        }
+        case CLASS_DEATH_KNIGHT:
+        {
+            caster->CastSpell(caster,87492,true);
+            break;
+        }
+        case CLASS_SHAMAN:
+        {
+            caster->CastSpell(caster,87497,true);
+            break;
+        }
+        case CLASS_MAGE:
+        {
+            caster->CastSpell(caster,86467,true);
+            break;
+        }
+        case CLASS_WARLOCK:
+        {
+            caster->CastSpell(caster,87498,true);
+            break;
+        }
+        case CLASS_DRUID:
+        {
+            caster->CastSpell(caster,87491,true);
+            break;
+        }
+    }
+}
 void Player::_RemoveAllItemMods()
 {
     sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "_RemoveAllItemMods start.");
@@ -21631,6 +21699,9 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
 
             uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
 
+        if (precision <= 1)
+            precision = 100;
+
             if (!HasCurrency(iece->RequiredCurrency[i], (iece->RequiredCurrencyCount[i] * count) / precision))
             {
                 SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL); // Find correct error
@@ -21760,6 +21831,9 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
             }
 
             uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
+
+        if (precision <= 1)
+            precision = 100;
 
             if (!HasCurrency(iece->RequiredCurrency[i], (iece->RequiredCurrencyCount[i] * count) / precision))
             {
@@ -26885,43 +26959,5 @@ void Player::RemoveOrAddMasterySpells()
 
         if (HasAura(76857))
             RemoveAurasDueToSpell(76857);
-    }
-    else if (HasAuraType(SPELL_AURA_MASTERY))
-    {
-        if (GetActiveSpec() == 399)
-            if (!HasAura(77514))
-             AddAura(77514, this);
-
-		if (GetActiveSpec() == 400)
-            if (!HasAura(77515))
-                AddAura(77515, this);
-
-		if (GetActiveSpec() == 750)
-            if (!HasAura(77493))
-                AddAura(77493, this);
-
-		if (GetActiveSpec() == 809)
-            if (!HasAura(76658))
-                AddAura(76658, this);
-
-		if (GetActiveSpec() == 811)
-            if (!HasAura(76657))
-                AddAura(76657, this);
-
-		if (GetActiveSpec() == 851)
-            if (!HasAura(76595))
-                AddAura(76595, this);
-
-		if (GetActiveSpec() == 839)
-            if (!HasAura(76671))
-                AddAura(76671, this);
-
-		if (GetActiveSpec() == 865)
-            if (!HasAura(77220))
-                AddAura(77220, this);
-
-		if (GetActiveSpec() == 845)
-            if (!HasAura(76857))
-                AddAura(76857, this);
     }
 }

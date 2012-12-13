@@ -13600,13 +13600,13 @@ int32 Unit::GetCreatePowers(Powers power) const
         case POWER_RAGE:
             return 1000;
         case POWER_FOCUS:
-            if (GetTypeId() == TYPEID_PLAYER && getClass() == CLASS_HUNTER || ((Pet const*)this)->getPetType() != HUNTER_PET)
+            if (GetTypeId() == TYPEID_PLAYER && getClass() == CLASS_HUNTER || ((Pet const*)this)->getPetType() == HUNTER_PET)
                 return 100;
-           // return (GetTypeId() == TYPEID_PLAYER || !((Creature const*)this)->isPet() || ((Pet const*)this)->getPetType() != HUNTER_PET ? 0 : 100);
+           return (GetTypeId() == TYPEID_PLAYER || !((Creature const*)this)->isPet() || ((Pet const*)this)->getPetType() != HUNTER_PET ? 0 : 100);
         case POWER_ENERGY:
             return 100;
         case POWER_RUNIC_POWER:
-            return 100;
+            return 1000;
         case POWER_RUNES:
             return 0;
         case POWER_HEALTH:

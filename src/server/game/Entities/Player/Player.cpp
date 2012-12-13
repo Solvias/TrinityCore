@@ -5193,6 +5193,8 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     if (GetSession()->IsARecruiter() || (GetSession()->GetRecruiterId() != 0))
         SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_REFER_A_FRIEND);
 
+      setDeathState(ALIVE);
+
     SendMovementSetWaterWalking(false);
     SetRooted(false);
 
@@ -5223,8 +5225,6 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 
     // update visibility
     UpdateObjectVisibility();
-
-	setDeathState(ALIVE);
 
     if (!applySickness)
         return;
@@ -7396,14 +7396,14 @@ void Player::_SaveCurrency(SQLTransaction& trans)
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_PLAYER_CURRENCY);
                 stmt->setUInt32(0, GetGUIDLow());
                 stmt->setUInt16(1, itr->first);
-                stmt->setUInt32(2, (itr->second.weekCount) * 100); 
-                stmt->setUInt32(3, (itr->second.totalCount) * 100); 
+                stmt->setUInt32(2, (itr->second.weekCount)); 
+                stmt->setUInt32(3, (itr->second.totalCount)); 
                 trans->Append(stmt);
                 break;
             case PLAYERCURRENCY_CHANGED:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PLAYER_CURRENCY);
-                stmt->setUInt32(0, (itr->second.weekCount) * 100); 
-                stmt->setUInt32(1, (itr->second.totalCount) * 100); 
+                stmt->setUInt32(0, (itr->second.weekCount)); 
+                stmt->setUInt32(1, (itr->second.totalCount)); 
                 stmt->setUInt32(2, GetGUIDLow());
                 stmt->setUInt16(3, itr->first);
                 trans->Append(stmt);
@@ -7430,10 +7430,7 @@ void Player::SendNewCurrency(uint32 id) const
     if (!entry) // should never happen
         return;
 
-    uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
-
-        if (precision <= 1)
-            precision = 100;
+    uint32 precision = (entry->Flags & 0x8) ? 100 : 1;
 
     uint32 weekCount = itr->second.weekCount / precision;
     uint32 weekCap = _GetCurrencyWeekCap(entry) / precision;
@@ -7475,11 +7472,7 @@ void Player::SendCurrencies() const
         if (!entry || entry->Category == CURRENCY_CATEGORY_META_CONQUEST)
             continue;
 
-        uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
-
-        if (precision <= 1)
-            precision = 100;
-
+        uint32 precision = (entry->Flags & 0x8) ? 100 : 1;
         uint32 weekCount = itr->second.weekCount / precision;
         uint32 weekCap = _GetCurrencyWeekCap(entry) / precision;
 
@@ -7571,7 +7564,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
     if (!ignoreMultipliers)
         count *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_CURRENCY_GAIN, id);
 
-    int32 precision = currency->Flags & CURRENCY_FLAG_HIGH_PRECISION ? CURRENCY_PRECISION : 1;
+    uint32 precision = (currency->Flags & 0x8) ? 100 : 1;
     uint32 oldTotalCount = 0;
     uint32 oldWeekCount = 0;
     PlayerCurrenciesMap::iterator itr = _currencyStorage.find(id);
@@ -8965,7 +8958,7 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
         }
     }
 }
-
+/*
 // These spells arent passive, they must be cast asap after player login.
 void Player::CastMasterySpells(Player* caster)
 {
@@ -9026,6 +9019,7 @@ void Player::CastMasterySpells(Player* caster)
         }
     }
 }
+*/
 void Player::_RemoveAllItemMods()
 {
     sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "_RemoveAllItemMods start.");
@@ -21697,10 +21691,7 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
                 return false;
             }
 
-            uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
-
-        if (precision <= 1)
-            precision = 100;
+       uint32 precision = (entry->Flags & 0x8) ? 100 : 1;
 
             if (!HasCurrency(iece->RequiredCurrency[i], (iece->RequiredCurrencyCount[i] * count) / precision))
             {
@@ -21830,10 +21821,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
                 return false;
             }
 
-            uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? CURRENCY_PRECISION : 1;
-
-        if (precision <= 1)
-            precision = 100;
+        uint32 precision = (entry->Flags & 0x8) ? 100 : 1;
 
             if (!HasCurrency(iece->RequiredCurrency[i], (iece->RequiredCurrencyCount[i] * count) / precision))
             {

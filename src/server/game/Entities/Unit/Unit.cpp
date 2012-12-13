@@ -6408,7 +6408,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 79133:
                 case 79134:
                 {
-                    if(effIndex != 0)
+                    if (effIndex != 0)
                         return false;
 
                     bool poisoned = false;
@@ -6789,19 +6789,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     target = this;
                     triggered_spell_id = 86700;
                     break;
-                }
-                // Long Arm of The law
-                case 87168:
-                case 87172:
-                {
-                    if (this->IsWithinDistInMap(victim, 15.0f))
-                      return false;
-					else 
-					{
-					    target = this;
-                        triggered_spell_id = 87173;
-                        break;
-					}
                 }
                 // Divine purpose
                 case 85117:
@@ -13613,13 +13600,13 @@ int32 Unit::GetCreatePowers(Powers power) const
         case POWER_RAGE:
             return 1000;
         case POWER_FOCUS:
-            if (GetTypeId() == TYPEID_PLAYER && getClass() == CLASS_HUNTER || ((Pet const*)this)->getPetType() == HUNTER_PET)
+            if (GetTypeId() == TYPEID_PLAYER && getClass() == CLASS_HUNTER || ((Pet const*)this)->getPetType() != HUNTER_PET)
                 return 100;
-            return (GetTypeId() == TYPEID_PLAYER || !((Creature const*)this)->isPet() || ((Pet const*)this)->getPetType() != HUNTER_PET ? 0 : 100);
+           // return (GetTypeId() == TYPEID_PLAYER || !((Creature const*)this)->isPet() || ((Pet const*)this)->getPetType() != HUNTER_PET ? 0 : 100);
         case POWER_ENERGY:
             return 100;
         case POWER_RUNIC_POWER:
-            return 1000;
+            return 100;
         case POWER_RUNES:
             return 0;
         case POWER_HEALTH:

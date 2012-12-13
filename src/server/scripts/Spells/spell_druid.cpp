@@ -47,8 +47,7 @@ enum DruidSpells
     DRUID_NPC_WILD_MUSHROOM             = 47649,
     DRUID_SPELL_WILD_MUSHROOM_SUICIDE   = 92853,
     DRUID_SPELL_WILD_MUSHROOM_DAMAGE    = 78777,
-
-   // Eclipse Spells
+	DRUID_SPELL_FERAL_CHARGE            = 49376,
 
 };
 
@@ -1004,6 +1003,46 @@ public:
     }
 };
 
+class spell_dru_feral_charge_trigger : public SpellScriptLoader
+{
+public:
+    spell_dru_feral_charge_trigger() : SpellScriptLoader("spell_dru_feral_charge_trigger") { }
+
+    class spell_dru_feral_charge_trigger_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dru_feral_charge_trigger_SpellScript);
+
+        bool Validate(SpellInfo const* /*entry*/)
+        {
+            if (!sSpellMgr->GetSpellInfo(DRUID_SPELL_FERAL_CHARGE))
+                return false;
+            return true;
+        }
+
+        void HandleEffectDummy(SpellEffIndex /*effIndex*/)
+        {
+	       Unit* caster = GetCaster();
+            Position destPos;
+
+            SpellCastTargets targets;
+
+            GetHitDest()->GetPosition(&destPos);
+            targets.SetDst(destPos);
+            targets.SetUnitTarget(GetCaster());
+            GetCaster()->CastSpell(targets, sSpellMgr->GetSpellInfo(GetEffectValue()), NULL);
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_dru_feral_charge_trigger_SpellScript::HandleEffectDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dru_feral_charge_trigger_SpellScript();
+    }
+};
 
 void AddSC_druid_spell_scripts()
 {
@@ -1025,4 +1064,5 @@ void AddSC_druid_spell_scripts()
     new spell_druid_wild_mushroom_detonate();
     new spell_druid_wild_mushroom();
     new spell_dru_eclipse_energize();
+	new spell_dru_feral_charge_trigger();
 }

@@ -5675,6 +5675,10 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
     const uint32 delayForInstantSpells4 = 230;
     const uint32 NOdelayForInstantSpells = 0;
 
+	    for (uint8 i = 0; i < CCDArraySize; ++i)
+        if (_spell->HasAura(auraWithCCD[i]))
+            return delayForInstantSpells;
+
     switch(_spell->SpellFamilyName)
     {
         case SPELLFAMILY_HUNTER:
@@ -5695,7 +5699,7 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
 				break;
         case SPELLFAMILY_PRIEST:
          //Psychic Scream
-          if (_spell->Id == 10890)
+          if (_spell->Id == 8122)
               return delayForInstantSpells;
 		break;
         case SPELLFAMILY_ROGUE:
@@ -5716,38 +5720,32 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
 			break;
         case SPELLFAMILY_MAGE:
             // Polymorph
-            if (_spell->Id == 12826)
+            if (_spell->Id == 118)
                 return delayForInstantSpells3;
             // Deep Freeze
             if (_spell->Id == 44572)
                 return delayForInstantSpells2;
             // Dragon Breath
-            if (_spell->Id == 42950)
+            if (_spell->Id == 31661)
                 return delayForInstantSpells;
             break;
         case SPELLFAMILY_WARRIOR:
             // Intercept
             if (_spell->Id == 20253)
                 return delayForInstantSpells2;
-            // Charge
-            if (_spell->Id == 7922)
-                return NOdelayForInstantSpells;
             // Charge trig.
             if (_spell->Id == 65929)
                 return NOdelayForInstantSpells;
             break;
         case SPELLFAMILY_WARLOCK:
             //DeathCoil
-            if (_spell->Id == 27223)
+            if (_spell->Id == 6781)
                 return delayForInstantSpells4;
 		    //Spell Lock - Debuff
 			if (_spell->Id == 24259)
 			    return delayForInstantSpells4;
            break;
         case SPELLFAMILY_DRUID:
-            // Feral charge
-            if (_spell->Id == 45334)
-                return delayForInstantSpells2;
             // Cyclone
             if (_spell->Id == 33786)
                 return delayForInstantSpells3;
@@ -5757,12 +5755,7 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
             break;
     }
 
-    for (uint8 i = 0; i < CCDArraySize; ++i)
-        if (_spell->HasAura(auraWithCCD[i]))
-            return delayForInstantSpells;
-
     return 0;
-
 }
 
 

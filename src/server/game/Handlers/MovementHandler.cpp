@@ -414,7 +414,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
             default: underMapValueZ = zone ? zone->MaxDepth : -500.0f; break;
         }
 
-        if (movementInfo.pos.GetPositionZ() < depth)
+        if (movementInfo.pos.GetPositionZ() < underMapValueZ)
         {
             if (!(plrMover->GetBattleground() && plrMover->GetBattleground()->HandlePlayerUnderMap(_player)))
             {

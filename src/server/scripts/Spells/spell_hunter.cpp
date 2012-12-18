@@ -1127,14 +1127,14 @@ public:
 };
 
 
-class spell_hun_furious_howl : public SpellScriptLoader
+class spell_hun_target_only_pet_and_owner : public SpellScriptLoader
 {
     public:
-        spell_hun_furious_howl() : SpellScriptLoader("spell_hun_furious_howl") { }
+        spell_hun_target_only_pet_and_owner() : SpellScriptLoader("spell_hun_target_only_pet_and_owner") { }
 
-        class spell_hun_furious_howl_SpellScript : public SpellScript
+        class spell_hun_target_only_pet_and_owner_SpellScript : public SpellScript
         {
-            PrepareSpellScript(spell_hun_furious_howl_SpellScript);
+            PrepareSpellScript(spell_hun_target_only_pet_and_owner_SpellScript);
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
@@ -1146,14 +1146,14 @@ class spell_hun_furious_howl : public SpellScriptLoader
 
             void Register()
             {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hun_furious_howl_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_CASTER_AREA_PARTY);
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hun_furious_howl_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_CASTER_AREA_PARTY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hun_target_only_pet_and_owner_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_CASTER_AREA_PARTY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hun_target_only_pet_and_owner_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_CASTER_AREA_PARTY);
             }
         };
 
         SpellScript* GetSpellScript() const
         {
-            return new spell_hun_furious_howl_SpellScript();
+            return new spell_hun_target_only_pet_and_owner_SpellScript();
         }
 };
 
@@ -1183,4 +1183,5 @@ void AddSC_hunter_spell_scripts()
 	new spell_hun_cobra_shot();
 	new spell_hun_tnt();
     new spell_hun_furious_howl();
+    new spell_hun_target_only_pet_and_owner();
 }

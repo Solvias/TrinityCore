@@ -38,8 +38,7 @@ enum ShamanSpells
     HUNTER_SPELL_INSANITY                  = 95809,
     MAGE_SPELL_TEMPORAL_DISPLACEMENT       = 80354,
 
-    SHAMAN_SPELL_EARTH_GRASP_R1            = 51483,
-    SHAMAN_SPELL_EARTH_GRASP_R2            = 51485,
+    SHAMAN_SPELL_EARTH_GRASP               = 51483,
     EARTHBIND_TOTEM_SPELL_EARTHGRAB        = 64695,
 
 	//Totemic Wrath
@@ -168,14 +167,11 @@ public:
                 Player* owner = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
                 if (!owner)
                     return;
+
                 // Earth's Grasp STILL BUGGED
-                if (AuraEffect* aurEff = owner->GetAuraEffectOfRankedSpell(SHAMAN_SPELL_EARTH_GRASP_R1, EFFECT_0))
-                {
+                if (AuraEffect* aurEff = owner->GetAuraEffectOfRankedSpell(SHAMAN_SPELL_EARTH_GRASP, EFFECT_0))
                     if (roll_chance_i(aurEff->GetAmount()))
                         owner->CastSpell(owner, EARTHBIND_TOTEM_SPELL_EARTHGRAB, true, NULL, aurEff);
-                }
-                else if (AuraEffect* aurEff = owner->GetAuraEffectOfRankedSpell(SHAMAN_SPELL_EARTH_GRASP_R2, EFFECT_0))
-                        owner->CastSpell(owner, EARTHBIND_TOTEM_SPELL_EARTHGRAB, true, NULL, aurEff); 
             }
 
         void Register()

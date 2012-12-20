@@ -1182,6 +1182,5 @@ void AddSC_hunter_spell_scripts()
 	new spell_hun_serpent_sting();
 	new spell_hun_cobra_shot();
 	new spell_hun_tnt();
-    new spell_hun_furious_howl();
     new spell_hun_target_only_pet_and_owner();
 }

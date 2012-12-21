@@ -556,8 +556,6 @@ enum CombatRating
     CR_HIT_TAKEN_SPELL          = 13,
     CR_CRIT_TAKEN_MELEE         = 14,
     CR_CRIT_TAKEN_RANGED        = 15,
-	CR_RESILIENCE_CRIT_TAKEN    = 14,
-	CR_RESILIENCE_PLAYER_DAMAGE_TAKEN = 15,
     CR_CRIT_TAKEN_SPELL         = 16,
     CR_HASTE_MELEE              = 17,
     CR_HASTE_RANGED             = 18,

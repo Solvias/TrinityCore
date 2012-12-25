@@ -338,7 +338,19 @@ void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, floa
     float dist = 2 * moveTimeHalf * speedXY;
     float max_height = -Movement::computeFallElevation(moveTimeHalf,false,-speedZ);
 
-    _owner->GetNearPoint(_owner, x, y, z, _owner->GetObjectSize(), dist, _owner->GetAngle(srcX, srcY) + M_PI);
+    float angle = _owner->GetAngle(srcX, srcY) + M_PI;
+    float angleplus = angle;   
+    float angleminus = angle;
+
+   _owner->GetNearPoint(_owner, x, y, z, _owner->GetObjectSize(), dist, angle);
+    while (!_owner->IsWithinLOS(x,y,z))
+    {
+        angleplus += 0.1f;
+        angleminus -= 0.1f;
+        _owner->GetNearPoint(_owner, x, y, z, _owner->GetObjectSize(), dist, angleplus);
+        if (!_owner->IsWithinLOS(x,y,z))
+            _owner->GetNearPoint(_owner, x, y, z, _owner->GetObjectSize(), dist, angleminus);
+    }
 
     Movement::MoveSplineInit init(_owner);
     init.MoveTo(x, y, z);
@@ -378,14 +390,14 @@ void MotionMaster::MoveJump(float x, float y, float z, float speedXY, float spee
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);
 }
 
-void MotionMaster::MoveFall(uint32 id/*=0*/)
+void MotionMaster::MoveFall(uint32 id /*=0*/)
 {
     // use larger distance for vmap height search than in most other cases
     float tz = _owner->GetMap()->GetHeight(_owner->GetPhaseMask(), _owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ(), true, MAX_FALL_DISTANCE);
     if (tz <= INVALID_HEIGHT)
     {
         sLog->outDebug(LOG_FILTER_GENERAL, "MotionMaster::MoveFall: unable retrive a proper height at map %u (x: %f, y: %f, z: %f).",
-            _owner->GetMap()->GetId(), _owner->GetPositionX(), _owner->GetPositionX(), _owner->GetPositionZ());
+            _owner->GetMap()->GetId(), _owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ());
         return;
     }
 

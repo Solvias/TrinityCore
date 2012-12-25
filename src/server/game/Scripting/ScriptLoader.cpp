@@ -24,12 +24,12 @@ void AddSC_example_gossip_codebox();
 void AddSC_example_misc();
 void AddSC_example_commandscript();
 
-// SAQIRMDEV USEFULL FIXES! A SAQIRM JE PAN
+//Custom Scriptes
 void AddSC_transmogrify_script();
-void AddSC_arena_spectator_script();
 void AddSC_utility_commandscript();
 void AddSC_npc_teleport();
 void AddSC_npc_supporter();
+void AddSC_guru_event();
 
 // spells
 void AddSC_deathknight_spell_scripts();
@@ -98,7 +98,6 @@ void AddSC_npc_innkeeper();
 void AddSC_npcs_special();
 void AddSC_npc_taxi();
 void AddSC_achievement_scripts();
-void AddSC_event_scripts();
 
 //eastern kingdoms
 void AddSC_alterac_valley();                 //Alterac Valley
@@ -329,6 +328,7 @@ void AddSC_boss_ayamiss();
 void AddSC_boss_ossirian();
 void AddSC_instance_ruins_of_ahnqiraj();
 void AddSC_boss_cthun();                     //Temple of ahn'qiraj
+void AddSC_boss_viscidus();
 void AddSC_boss_fankriss();
 void AddSC_boss_huhuran();
 void AddSC_bug_trio();
@@ -610,6 +610,9 @@ void AddSC_shattrath_city();
 void AddSC_terokkar_forest();
 void AddSC_zangarmarsh();
 
+// Events
+void AddSC_event_childrens_week();
+
 // battlegrounds
 
 // outdoor pvp
@@ -723,7 +726,6 @@ void AddWorldScripts()
     AddSC_npc_taxi();
     AddSC_achievement_scripts();
     AddSC_chat_log();
-    AddSC_event_scripts();
 #endif
 }
 
@@ -962,6 +964,7 @@ void AddKalimdorScripts()
     AddSC_boss_ossirian();
     AddSC_instance_ruins_of_ahnqiraj();
     AddSC_boss_cthun();                     //Temple of ahn'qiraj
+    AddSC_boss_viscidus();
     AddSC_boss_fankriss();
     AddSC_boss_huhuran();
     AddSC_bug_trio();
@@ -1253,6 +1256,13 @@ void AddNorthrendScripts()
 #endif
 }
 
+void AddEventScripts()
+{
+#ifdef SCRIPTS
+    AddSC_event_childrens_week();
+#endif
+}
+
 void AddOutdoorPvPScripts()
 {
 #ifdef SCRIPTS
@@ -1281,11 +1291,11 @@ void AddCustomScripts()
 #ifdef SCRIPTS
     /* This is where custom scripts should be added. */
     AddSC_transmogrify_script();
-    AddSC_arena_spectator_script();
     AddSC_utility_commandscript();
     AddSC_EM_trader();
     AddSC_npc_teleport();
 	AddSC_npc_supporter();
+	AddSC_guru_event();
 
 #endif
 }

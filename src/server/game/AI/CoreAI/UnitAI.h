@@ -24,20 +24,10 @@
 #include "Containers.h"
 #include <list>
 
-class Unit;
 class Player;
+class Quest;
+class Unit;
 struct AISpellInfoType;
-
-// Default script texts
-enum GeneralScriptTexts
-{
-    DEFAULT_TEXT                = -1000000,
-    EMOTE_GENERIC_FRENZY_KILL   = -1000001,
-    EMOTE_GENERIC_FRENZY        = -1000002,
-    EMOTE_GENERIC_ENRAGED       = -1000003,
-    EMOTE_GENERIC_BERSERK       = -1000004,
-    EMOTE_GENERIC_BERSERK_RAID  = -1000005 // RaidBossEmote version of the previous one
-};
 
 //Selection method used by SelectTarget
 enum SelectAggroTarget
@@ -146,10 +136,10 @@ class UnitAI
 
         // Pass parameters between AI
         virtual void DoAction(int32 const /*param*/) {}
-        virtual uint32 GetData(uint32 /*id = 0*/) { return 0; }
+        virtual uint32 GetData(uint32 /*id = 0*/) const { return 0; }
         virtual void SetData(uint32 /*id*/, uint32 /*value*/) {}
         virtual void SetGUID(uint64 /*guid*/, int32 /*id*/ = 0) {}
-        virtual uint64 GetGUID(int32 /*id*/ = 0) { return 0; }
+        virtual uint64 GetGUID(int32 /*id*/ = 0) const { return 0; }
 
         Unit* SelectTarget(SelectAggroTarget targetType, uint32 position = 0, float dist = 0.0f, bool playerOnly = false, int32 aura = 0);
         // Select the targets satifying the predicate.

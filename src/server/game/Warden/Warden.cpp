@@ -150,6 +150,7 @@ bool Warden::IsValidCheckSum(uint32 checksum, const uint8* data, const uint16 le
         return true;
     }
 }
+
 struct keyData {
     union
     {

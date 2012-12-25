@@ -20,9 +20,11 @@
 #include "CreatureAI.h"
 #include "MapManager.h"
 #include "FleeingMovementGenerator.h"
+#include "PathGenerator.h"
 #include "ObjectAccessor.h"
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
+#include "Player.h"
  
 #define MIN_QUIET_DISTANCE 28.0f
 #define MAX_QUIET_DISTANCE 43.0f
@@ -353,7 +355,11 @@ void FleeingMovementGenerator<T>::Reset(T* owner)
 }
  
 template<class T>
+<<<<<<< HEAD
 bool FleeingMovementGenerator<T>::Update(T* owner, const uint32 &time_diff)
+=======
+bool FleeingMovementGenerator<T>::Update(T* owner, uint32 time_diff)
+>>>>>>> a0239c2210a49a3b41a764d41d75098e8bb8ffeb
 {
     if (!owner || !owner->isAlive())
         return false;
@@ -380,9 +386,15 @@ template void FleeingMovementGenerator<Player>::_setTargetLocation(Player*);
 template void FleeingMovementGenerator<Creature>::_setTargetLocation(Creature*);
 template void FleeingMovementGenerator<Player>::Reset(Player*);
 template void FleeingMovementGenerator<Creature>::Reset(Creature*);
+<<<<<<< HEAD
 template bool FleeingMovementGenerator<Player>::Update(Player*, const uint32 &);
 template bool FleeingMovementGenerator<Creature>::Update(Creature*, const uint32 &);
  
+=======
+template bool FleeingMovementGenerator<Player>::Update(Player*, uint32);
+template bool FleeingMovementGenerator<Creature>::Update(Creature*, uint32);
+
+>>>>>>> a0239c2210a49a3b41a764d41d75098e8bb8ffeb
 void TimedFleeingMovementGenerator::Finalize(Unit* owner)
 {
     owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING);
@@ -396,8 +408,13 @@ void TimedFleeingMovementGenerator::Finalize(Unit* owner)
         }
     }
 }
+<<<<<<< HEAD
  
 bool TimedFleeingMovementGenerator::Update(Unit* owner, const uint32& time_diff)
+=======
+
+bool TimedFleeingMovementGenerator::Update(Unit* owner, uint32 time_diff)
+>>>>>>> a0239c2210a49a3b41a764d41d75098e8bb8ffeb
 {
     if (!owner->isAlive())
         return false;
@@ -411,8 +428,13 @@ bool TimedFleeingMovementGenerator::Update(Unit* owner, const uint32& time_diff)
     i_totalFleeTime.Update(time_diff);
     if (i_totalFleeTime.Passed())
         return false;
+<<<<<<< HEAD
  
     // This calls grant-parent Update method hiden by FleeingMovementGenerator::Update(Creature &, const uint32 &) version
+=======
+
+    // This calls grant-parent Update method hiden by FleeingMovementGenerator::Update(Creature &, uint32) version
+>>>>>>> a0239c2210a49a3b41a764d41d75098e8bb8ffeb
     // This is done instead of casting Unit& to Creature& and call parent method, then we can use Unit directly
     return MovementGeneratorMedium< Creature, FleeingMovementGenerator<Creature> >::Update(owner, time_diff);
 }

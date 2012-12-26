@@ -23,6 +23,7 @@
 #include "DatabaseEnv.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"
+#include "DBCEnums.h"
 
 #include <string>
 #include <vector>
@@ -168,7 +169,7 @@ enum __QuestSpecialFlags
     QUEST_SPECIAL_FLAGS_MONTHLY              = 0x010, // quest is reset at the begining of the month
     // room for more custom flags
 
-    QUEST_SPECIAL_FLAGS_DB_ALLOWED = QUEST_SPECIAL_FLAGS_REPEATABLE | QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT | QUEST_SPECIAL_FLAGS_AUTO_ACCEPT | QUEST_SPECIAL_FLAGS_DF_QUEST,
+    QUEST_SPECIAL_FLAGS_DB_ALLOWED = QUEST_SPECIAL_FLAGS_REPEATABLE | QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT | QUEST_SPECIAL_FLAGS_AUTO_ACCEPT | QUEST_SPECIAL_FLAGS_DF_QUEST | QUEST_SPECIAL_FLAGS_MONTHLY,
 
     QUEST_SPECIAL_FLAGS_DELIVER              = 0x080,   // Internal flag computed only
     QUEST_SPECIAL_FLAGS_SPEAKTO              = 0x100,   // Internal flag computed only

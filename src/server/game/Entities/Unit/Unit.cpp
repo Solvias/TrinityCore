@@ -786,12 +786,6 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
         }
     }
 
-	   if(spellProto && m_havocTarget != NULL && GetTypeId() == TYPEID_PLAYER && spellProto->Id != 85455)
-    {
-        int32 dmg = int32(damage * 0.15f);
-        CastCustomSpell(m_havocTarget,85455,&dmg,NULL,NULL,true); // Bane of Havoc
-    }
-
     sLog->outDebug(LOG_FILTER_UNITS, "DealDamageEnd returned %d damage", damage);
 
     return damage;

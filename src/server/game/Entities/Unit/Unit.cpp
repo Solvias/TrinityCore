@@ -13595,8 +13595,6 @@ int32 Unit::GetCreatePowers(Powers power) const
             return (GetTypeId() == TYPEID_PLAYER && ToPlayer()->getClass() == CLASS_DRUID ? 100 : 0);
         case POWER_HOLY_POWER:
             return 3;
-        case POWER_HEALTH:
-            return 0;
         default:
             break;
     }

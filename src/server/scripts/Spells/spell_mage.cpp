@@ -55,7 +55,6 @@ enum MageSpells
     SPELL_MAGE_EARLY_FROST_R2_CD                 = 83239,
 
     SPELL_MAGE_CONJURE_REFRESHMENT               = 42955,
-
     SPELL_MAGE_FLAMESTRIKE                       = 2120,
     SPELL_MAGE_CHILLED_R1                        = 12484,
     SPELL_MAGE_CHILLED_R2                        = 12485,
@@ -101,15 +100,15 @@ class spell_mage_blast_wave : public SpellScriptLoader
                 _targetCount = targetList.size();
             }
 
-           void HandleImprovedFlamestrike()
-           {
+            void HandleImprovedFlamestrike()
+            {
                 if (_targetCount >= 2)
                     if (AuraEffect* aurEff = GetCaster()->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_MAGE, ICON_MAGE_IMPROVED_FLAMESTRIKE, EFFECT_0))
-                        if (roll_chance_i(aurEff->GetAmount()))	
+                        if (roll_chance_i(aurEff->GetAmount()))
                         {
                             float x, y, z;
                             WorldLocation const* loc = GetExplTargetDest();
-                           if (!loc)
+                            if (!loc)
                                 return;
 
                             loc->GetPosition(x, y, z);
@@ -120,9 +119,10 @@ class spell_mage_blast_wave : public SpellScriptLoader
             void Register()
             {
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mage_blast_wave_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
-               AfterCast += SpellCastFn(spell_mage_blast_wave_SpellScript::HandleImprovedFlamestrike);
+                AfterCast += SpellCastFn(spell_mage_blast_wave_SpellScript::HandleImprovedFlamestrike);
             }
-			private:
+
+        private:
             uint32 _targetCount;
         };
 
@@ -518,6 +518,8 @@ public:
     }
 };
 
+// 42955 Conjure Refreshment
+/// Updated 4.3.4
 struct ConjureRefreshmentData
 {
     uint32 minLevel;
@@ -573,7 +575,6 @@ class spell_mage_conjure_refreshment : public SpellScriptLoader
                     break;
                 }
             }
-
 
             void Register()
             {
@@ -833,57 +834,6 @@ class spell_mage_replenish_mana : public SpellScriptLoader
         }
 };
 
-class spell_mage_water_elemental_freeze : public SpellScriptLoader
-{
-    public:
-        spell_mage_water_elemental_freeze() : SpellScriptLoader("spell_mage_water_elemental_freeze") { }
-
-        class spell_mage_water_elemental_freeze_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_mage_water_elemental_freeze_SpellScript);
-
-            bool Validate(SpellInfo const* /*spellEntry*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_MAGE_FINGERS_OF_FROST))
-                    return false;
-                return true;
-            }
-
-            void CountTargets(std::list<WorldObject*>& targetList)
-            {
-                _didHit = targetList.size() != 0;
-            }
-
-            void HandleImprovedFreeze()
-            {
-                if (!_didHit)
-                    return;
-
-                Unit* owner = GetCaster()->GetOwner();
-                if (!owner)
-                    return;
-
-                if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_MAGE, ICON_MAGE_IMPROVED_FREEZE, EFFECT_0))
-                    if (roll_chance_i(aurEff->GetAmount()))
-                        owner->CastCustomSpell(SPELL_MAGE_FINGERS_OF_FROST, SPELLVALUE_AURA_STACK, 2, owner, true);
-
-            }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mage_water_elemental_freeze_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
-                AfterCast += SpellCastFn(spell_mage_water_elemental_freeze_SpellScript::HandleImprovedFreeze);
-            }
-
-        private:
-            bool _didHit;
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_mage_water_elemental_freeze_SpellScript();
-        }
-};
 
 // 11129 Combustion
 /// Updated 4.3.4
@@ -932,6 +882,61 @@ class spell_mage_combustion : public SpellScriptLoader
 };
 
 
+// 33395 Water Elemental's Freeze
+/// Updated 4.3.4
+class spell_mage_water_elemental_freeze : public SpellScriptLoader
+{
+   public:
+       spell_mage_water_elemental_freeze() : SpellScriptLoader("spell_mage_water_elemental_freeze") { }
+
+       class spell_mage_water_elemental_freeze_SpellScript : public SpellScript
+       {
+           PrepareSpellScript(spell_mage_water_elemental_freeze_SpellScript);
+
+           bool Validate(SpellInfo const* /*spellEntry*/)
+           {
+               if (!sSpellMgr->GetSpellInfo(SPELL_MAGE_FINGERS_OF_FROST))
+                   return false;
+               return true;
+           }
+
+           void CountTargets(std::list<WorldObject*>& targetList)
+           {
+               _didHit = !targetList.empty();
+           }
+
+           void HandleImprovedFreeze()
+           {
+               if (!_didHit)
+                   return;
+
+               Unit* owner = GetCaster()->GetOwner();
+               if (!owner)
+                   return;
+
+               if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_MAGE, ICON_MAGE_IMPROVED_FREEZE, EFFECT_0))
+               {
+                   if (roll_chance_i(aurEff->GetAmount()))
+                       owner->CastCustomSpell(SPELL_MAGE_FINGERS_OF_FROST, SPELLVALUE_AURA_STACK, 2, owner, true);
+               }
+           }
+
+           void Register()
+           {
+               OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mage_water_elemental_freeze_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+               AfterCast += SpellCastFn(spell_mage_water_elemental_freeze_SpellScript::HandleImprovedFreeze);
+           }
+
+       private:
+           bool _didHit;
+       };
+
+       SpellScript* GetSpellScript() const
+       {
+           return new spell_mage_water_elemental_freeze_SpellScript();
+       }
+};
+
 void AddSC_mage_spell_scripts()
 {
     new spell_mage_blast_wave();
@@ -949,7 +954,6 @@ void AddSC_mage_spell_scripts()
     new spell_mage_ice_barrier();
     new spell_mage_mana_shield();
     new spell_mage_mage_ward();
-    new spell_mage_replenish_mana();	
     new spell_mage_water_elemental_freeze();
     new spell_mage_combustion();
 }

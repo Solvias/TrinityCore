@@ -1586,9 +1586,6 @@ void AddSC_quest_spell_scripts()
     new spell_q11010_q11102_q11023_aggro_burst();
     new spell_q11010_q11102_q11023_choose_loc();
     new spell_q11010_q11102_q11023_q11008_check_fly_mount();
-<<<<<<< HEAD
+	new spell_q12372_azure_on_death_force_whisper();
 	new spell_worgen_last_stand_movie();
-=======
-    new spell_q12372_azure_on_death_force_whisper();
->>>>>>> d4f936a4fa9f4b6202ee5a5d1565373c7ca5d5e8
 }

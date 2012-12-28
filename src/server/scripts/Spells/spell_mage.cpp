@@ -862,9 +862,12 @@ class spell_mage_combustion : public SpellScriptLoader
 
                     for (Unit::AuraEffectList::const_iterator i = targetAuras.begin(); i != targetAuras.end(); ++i)
                         if ((*i)->GetCaster() == GetCaster() && (*i)->GetSpellInfo()->SchoolMask == SPELL_SCHOOL_MASK_FIRE)
-                            basePoints0 += (*i)->GetAmount() / 1.33f; // Penalty [Very High Tick]
+                            basePoints0 += (*i)->GetAmount();
+						else
+						    basePoints0 = 0;
+						
 
-                    if (basePoints0)
+                    if (basePoints0 > 0)
                         GetCaster()->CastCustomSpell(target, SPELL_MAGE_COMBUSTION_PERIODIC_DAMAGE, &basePoints0, NULL, NULL, true);
                 }
             }
@@ -956,4 +959,5 @@ void AddSC_mage_spell_scripts()
     new spell_mage_mage_ward();
     new spell_mage_water_elemental_freeze();
     new spell_mage_combustion();
+	new spell_mage_replenish_mana(); 
 }

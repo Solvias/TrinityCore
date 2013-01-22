@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -326,7 +326,7 @@ void Map::DeleteFromWorld(Player* player)
 
 void Map::EnsureGridCreated(const GridCoord &p)
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, Lock);
+    TRINITY_GUARD(ACE_Thread_Mutex, GridLock);
     EnsureGridCreated_i(p);
 }
 

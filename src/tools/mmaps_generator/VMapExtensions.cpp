@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -57,7 +57,7 @@ namespace VMAP
     }
 
     // declared in src/shared/vmap/ModelInstance.h
-    WorldModel* const ModelInstance::getWorldModel()
+    WorldModel* ModelInstance::getWorldModel()
     {
         return iModel;
     }

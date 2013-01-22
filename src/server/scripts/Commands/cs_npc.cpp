@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -32,6 +32,42 @@ EndScriptData */
 #include "CreatureAI.h"
 #include "Player.h"
 #include "Pet.h"
+
+struct NpcFlagText
+{
+    uint32 flag;
+    int32 text;
+};
+
+#define NPCFLAG_COUNT   24
+
+const NpcFlagText npcFlagTexts[NPCFLAG_COUNT] =
+{
+    { UNIT_NPC_FLAG_AUCTIONEER,         LANG_NPCINFO_AUCTIONEER         },
+    { UNIT_NPC_FLAG_BANKER,             LANG_NPCINFO_BANKER             },
+    { UNIT_NPC_FLAG_BATTLEMASTER,       LANG_NPCINFO_BATTLEMASTER       },
+    { UNIT_NPC_FLAG_FLIGHTMASTER,       LANG_NPCINFO_FLIGHTMASTER       },
+    { UNIT_NPC_FLAG_GOSSIP,             LANG_NPCINFO_GOSSIP             },
+    { UNIT_NPC_FLAG_GUILD_BANKER,       LANG_NPCINFO_GUILD_BANKER       },
+    { UNIT_NPC_FLAG_INNKEEPER,          LANG_NPCINFO_INNKEEPER          },
+    { UNIT_NPC_FLAG_PETITIONER,         LANG_NPCINFO_PETITIONER         },
+    { UNIT_NPC_FLAG_PLAYER_VEHICLE,     LANG_NPCINFO_PLAYER_VEHICLE     },
+    { UNIT_NPC_FLAG_QUESTGIVER,         LANG_NPCINFO_QUESTGIVER         },
+    { UNIT_NPC_FLAG_REPAIR,             LANG_NPCINFO_REPAIR             },
+    { UNIT_NPC_FLAG_SPELLCLICK,         LANG_NPCINFO_SPELLCLICK         },
+    { UNIT_NPC_FLAG_SPIRITGUIDE,        LANG_NPCINFO_SPIRITGUIDE        },
+    { UNIT_NPC_FLAG_SPIRITHEALER,       LANG_NPCINFO_SPIRITHEALER       },
+    { UNIT_NPC_FLAG_STABLEMASTER,       LANG_NPCINFO_STABLEMASTER       },
+    { UNIT_NPC_FLAG_TABARDDESIGNER,     LANG_NPCINFO_TABARDDESIGNER     },
+    { UNIT_NPC_FLAG_TRAINER,            LANG_NPCINFO_TRAINER            },
+    { UNIT_NPC_FLAG_TRAINER_CLASS,      LANG_NPCINFO_TRAINER_CLASS      },
+    { UNIT_NPC_FLAG_TRAINER_PROFESSION, LANG_NPCINFO_TRAINER_PROFESSION },
+    { UNIT_NPC_FLAG_VENDOR,             LANG_NPCINFO_VENDOR             },
+    { UNIT_NPC_FLAG_VENDOR_AMMO,        LANG_NPCINFO_VENDOR_AMMO        },
+    { UNIT_NPC_FLAG_VENDOR_FOOD,        LANG_NPCINFO_VENDOR_FOOD        },
+    { UNIT_NPC_FLAG_VENDOR_POISON,      LANG_NPCINFO_VENDOR_POISON      },
+    { UNIT_NPC_FLAG_VENDOR_REAGENT,     LANG_NPCINFO_VENDOR_REAGENT     }
+};
 
 class npc_commandscript : public CommandScript
 {
@@ -87,6 +123,7 @@ public:
         static ChatCommand npcCommandTable[] =
         {
             { "info",           SEC_ADMINISTRATOR,  false, &HandleNpcInfoCommand,              "", NULL },
+            { "near",           SEC_GAMEMASTER,     false, &HandleNpcNearCommand,              "", NULL },
             { "move",           SEC_GAMEMASTER,     false, &HandleNpcMoveCommand,              "", NULL },
             { "playemote",      SEC_ADMINISTRATOR,  false, &HandleNpcPlayEmoteCommand,         "", NULL },
             { "say",            SEC_MODERATOR,      false, &HandleNpcSayCommand,               "", NULL },
@@ -617,11 +654,55 @@ public:
         handler->PSendSysMessage(LANG_NPCINFO_POSITION, float(target->GetPositionX()), float(target->GetPositionY()), float(target->GetPositionZ()));
         handler->PSendSysMessage(LANG_NPCINFO_AIINFO, target->GetAIName().c_str(), target->GetScriptName().c_str());
 
-        if (npcflags & UNIT_NPC_FLAG_VENDOR)
-            handler->SendSysMessage(LANG_NPCINFO_VENDOR);
+        for (uint8 i = 0; i < NPCFLAG_COUNT; i++)
+            if (npcflags & npcFlagTexts[i].flag)
+                handler->PSendSysMessage(npcFlagTexts[i].text, npcFlagTexts[i].flag);
 
-        if (npcflags & UNIT_NPC_FLAG_TRAINER)
-            handler->SendSysMessage(LANG_NPCINFO_TRAINER);
+        return true;
+    }
+
+    static bool HandleNpcNearCommand(ChatHandler* handler, char const* args)
+    {
+        float distance = (!*args) ? 10.0f : float((atof(args)));
+        uint32 count = 0;
+
+        Player* player = handler->GetSession()->GetPlayer();
+
+        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_NEAREST);
+        stmt->setFloat(0, player->GetPositionX());
+        stmt->setFloat(1, player->GetPositionY());
+        stmt->setFloat(2, player->GetPositionZ());
+        stmt->setUInt32(3, player->GetMapId());
+        stmt->setFloat(4, player->GetPositionX());
+        stmt->setFloat(5, player->GetPositionY());
+        stmt->setFloat(6, player->GetPositionZ());
+        stmt->setFloat(7, distance * distance);
+        PreparedQueryResult result = WorldDatabase.Query(stmt);
+
+        if (result)
+        {
+            do
+            {
+                Field* fields = result->Fetch();
+                uint32 guid = fields[0].GetUInt32();
+                uint32 entry = fields[1].GetUInt32();
+                float x = fields[2].GetFloat();
+                float y = fields[3].GetFloat();
+                float z = fields[4].GetFloat();
+                uint16 mapId = fields[5].GetUInt16();
+
+                CreatureTemplate const* creatureTemplate = sObjectMgr->GetCreatureTemplate(entry);
+                if (!creatureTemplate)
+                    continue;
+
+                handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, creatureTemplate->Name.c_str(), x, y, z, mapId);
+
+                ++count;
+            }
+            while (result->NextRow());
+        }
+
+        handler->PSendSysMessage(LANG_COMMAND_NEAR_NPC_MESSAGE, distance, count);
 
         return true;
     }

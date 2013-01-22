@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -223,6 +223,158 @@ class spell_gen_cannibalize : public SpellScriptLoader
         SpellScript* GetSpellScript() const
         {
             return new spell_gen_cannibalize_SpellScript();
+        }
+};
+
+// 63845 - Create Lance
+enum CreateLanceSpells
+{
+    SPELL_CREATE_LANCE_ALLIANCE = 63914,
+    SPELL_CREATE_LANCE_HORDE    = 63919
+};
+
+class spell_gen_create_lance : public SpellScriptLoader
+{
+    public:
+        spell_gen_create_lance() : SpellScriptLoader("spell_gen_create_lance") { }
+
+        class spell_gen_create_lance_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_gen_create_lance_SpellScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_CREATE_LANCE_ALLIANCE) || !sSpellMgr->GetSpellInfo(SPELL_CREATE_LANCE_HORDE))
+                    return false;
+                return true;
+            }
+
+            void HandleScript(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+
+                if (Player* target = GetHitPlayer())
+                {
+                    if (target->GetTeam() == ALLIANCE)
+                        GetCaster()->CastSpell(target, SPELL_CREATE_LANCE_ALLIANCE, true);
+                    else
+                        GetCaster()->CastSpell(target, SPELL_CREATE_LANCE_HORDE, true);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_gen_create_lance_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_gen_create_lance_SpellScript();
+        }
+};
+
+// 28702 - Netherbloom
+enum Netherbloom
+{
+    SPELL_NETHERBLOOM_POLLEN_1 = 28703
+};
+
+class spell_gen_netherbloom : public SpellScriptLoader
+{
+    public:
+        spell_gen_netherbloom() : SpellScriptLoader("spell_gen_netherbloom") { }
+
+        class spell_gen_netherbloom_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_gen_netherbloom_SpellScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                for (uint8 i = 0; i < 5; ++i)
+                    if (!sSpellMgr->GetSpellInfo(SPELL_NETHERBLOOM_POLLEN_1 + i))
+                        return false;
+                return true;
+            }
+
+            void HandleScript(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+
+                if (Unit* target = GetHitUnit())
+                {
+                    // 25% chance of casting a random buff
+                    if (roll_chance_i(75))
+                        return;
+
+                    // triggered spells are 28703 to 28707
+                    // Note: some sources say, that there was the possibility of
+                    //       receiving a debuff. However, this seems to be removed by a patch.
+
+                    // don't overwrite an existing aura
+                    for (uint8 i = 0; i < 5; ++i)
+                        if (target->HasAura(SPELL_NETHERBLOOM_POLLEN_1 + i))
+                            return;
+
+                    target->CastSpell(target, SPELL_NETHERBLOOM_POLLEN_1 + urand(0, 4), true);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_gen_netherbloom_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_gen_netherbloom_SpellScript();
+        }
+};
+
+// 28720 - Nightmare Vine
+enum NightmareVine
+{
+    SPELL_NIGHTMARE_POLLEN  = 28721
+};
+
+class spell_gen_nightmare_vine : public SpellScriptLoader
+{
+    public:
+        spell_gen_nightmare_vine() : SpellScriptLoader("spell_gen_nightmare_vine") { }
+
+        class spell_gen_nightmare_vine_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_gen_nightmare_vine_SpellScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_NIGHTMARE_POLLEN))
+                    return false;
+                return true;
+            }
+
+            void HandleScript(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+
+                if (Unit* target = GetHitUnit())
+                {
+                    // 25% chance of casting Nightmare Pollen
+                    if (roll_chance_i(25))
+                        target->CastSpell(target, SPELL_NIGHTMARE_POLLEN, true);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_gen_nightmare_vine_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_gen_nightmare_vine_SpellScript();
         }
 };
 
@@ -1550,7 +1702,7 @@ class spell_gen_gnomish_transporter : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /* effIndex */)
             {
                 Unit* caster = GetCaster();
-                caster->CastSpell(caster, roll_chance_i(50) ? SPELL_TRANSPORTER_SUCCESS : SPELL_TRANSPORTER_FAILURE , true);
+                caster->CastSpell(caster, roll_chance_i(50) ? SPELL_TRANSPORTER_SUCCESS : SPELL_TRANSPORTER_FAILURE, true);
             }
 
             void Register()
@@ -3127,6 +3279,22 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
                 data << uint32(spellInfo->Id);
                 data << uint32(0);
                 caster->GetSession()->SendPacket(&data);
+            }
+
+        void Register()
+        {
+            OnEffectHit += SpellEffectFn(spell_pvp_trinket_wotf_shared_cd_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_pvp_trinket_wotf_shared_cd_SpellScript();
+    }
+};
+
+
+
 enum Replenishment
 {
     SPELL_REPLENISHMENT             = 57669,
@@ -3189,6 +3357,9 @@ void AddSC_generic_spell_scripts()
     new spell_gen_av_drekthar_presence();
     new spell_gen_burn_brutallus();
     new spell_gen_cannibalize();
+    new spell_gen_create_lance();
+    new spell_gen_netherbloom();
+    new spell_gen_nightmare_vine();
     new spell_gen_parachute();
     new spell_gen_pet_summoned();
     new spell_gen_remove_flight_auras();

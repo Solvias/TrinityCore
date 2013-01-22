@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -47,14 +47,13 @@ class TargetedMovementGeneratorMedium : public MovementGeneratorMedium< T, D >, 
         ~TargetedMovementGeneratorMedium() { delete i_path; }
 
     public:
-        bool Update(T*, uint32);
+        bool DoUpdate(T*, uint32);
         Unit* GetTarget() const { return i_target.getTarget(); }
 
         void unitSpeedChanged() { i_recalculateTravel = true; }
-        void UpdateFinalDistance(float fDistance);
         bool IsReachable() const { return (i_path) ? (i_path->GetPathType() & PATHFIND_NORMAL) : true; }
     protected:
-        void _setTargetLocation(T*);
+        void _setTargetLocation(T* owner, bool updateDestination);
 
         TimeTrackerSmall i_recheckDistance;
         float i_offset;
@@ -76,9 +75,9 @@ class ChaseMovementGenerator : public TargetedMovementGeneratorMedium<T, ChaseMo
 
         MovementGeneratorType GetMovementGeneratorType() { return CHASE_MOTION_TYPE; }
 
-        void Initialize(T*);
-        void Finalize(T*);
-        void Reset(T*);
+        void DoInitialize(T*);
+        void DoFinalize(T*);
+        void DoReset(T*);
         void MovementInform(T*);
 
         static void _clearUnitStateMove(T* u) { u->ClearUnitState(UNIT_STATE_CHASE_MOVE); }
@@ -100,9 +99,9 @@ class FollowMovementGenerator : public TargetedMovementGeneratorMedium<T, Follow
 
         MovementGeneratorType GetMovementGeneratorType() { return FOLLOW_MOTION_TYPE; }
 
-        void Initialize(T*);
-        void Finalize(T*);
-        void Reset(T*);
+        void DoInitialize(T*);
+        void DoFinalize(T*);
+        void DoReset(T*);
         void MovementInform(T*);
 
         static void _clearUnitStateMove(T* u) { u->ClearUnitState(UNIT_STATE_FOLLOW_MOVE); }
@@ -111,11 +110,7 @@ class FollowMovementGenerator : public TargetedMovementGeneratorMedium<T, Follow
         bool _lostTarget(T*) const { return false; }
         void _reachTarget(T*) {}
     private:
-        void _updateSpeed(T* u);
+        void _updateSpeed(T* owner);
 };
 
-<<<<<<< HEAD
 #endif
-=======
-#endif
->>>>>>> a0239c2210a49a3b41a764d41d75098e8bb8ffeb

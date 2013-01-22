@@ -270,18 +270,11 @@ PlayerSave.Stats.SaveOnlyOnLogout = 1
 
 #
 #    mmap.enablePathFinding
-#        Description: Enable/Disable pathfinding using mmaps
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
+#        Description: Enable/Disable pathfinding using mmaps - experimental
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
 
-mmap.enablePathFinding = 1
-
-#
-#    mmap.ignoreMapIds
-#        Disable mmap pathfinding on the listed maps.
-#        List of map ids with delimiter ','
-
-mmap.ignoreMapIds = ""
+mmap.enablePathFinding = 0
 
 #
 #    vmap.enableLOS
@@ -293,15 +286,6 @@ mmap.ignoreMapIds = ""
 
 vmap.enableLOS    = 1
 vmap.enableHeight = 1
-
-#
-#    vmap.ignoreSpellIds
-#        Description: These spells are ignored for LoS calculation.
-#                     List of ids with delimiter ','.
-#        Example:     "7720,1337"
-#        Default:     "7720"
-
-vmap.ignoreSpellIds = "7720"
 
 #
 #    vmap.enableIndoorCheck
@@ -2838,6 +2822,102 @@ Logger.Opcodes=41,6,Console Server
 #        Default:     "Root Chat DBErrors GM RA Warden Character Load"
 
 Loggers=Root Chat DBErrors GM RA Warden Character Load WorldServer Opcodes
+
+#
+#    Log.Async.Enable
+#        Description: Enables asyncronous message logging.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Log.Async.Enable = 0
+
+#
+###################################################################################################
+
+###################################################################################################
+#    Transmogrification config
+###################################################################################################
+#
+#    GOLD COST
+#
+#    Transmogrification.RequireGold
+#        Description: 0 No gold cost, 1 scaling gold cost, 2 custom gold cost
+#        Default:    1
+#
+#    Transmogrification.GoldModifier
+#        Description: A multiplier for the default gold cost (Transmogrification.RequireGold is 1)
+#        Default:    1.0
+#
+#    Transmogrification.GoldCost
+#        Description: Cost of transmogrification in copper for custom gold cost (Transmogrification.RequireGold is 2)
+#        Default:    100000
+
+Transmogrification.RequireGold = 1
+Transmogrification.GoldModifier = 1.0
+Transmogrification.GoldCost = 100000
+
+#
+#    TOKEN COST
+#
+#    Transmogrification.RequireToken
+#        Description: Adds/disables token cost
+#        Default:    0
+#
+#    Transmogrification.TokenEntry
+#        Description: Entry of the token item
+#        Default:    49426
+#
+#    Transmogrification.TokenAmount
+#        Description: Amount of tokens required
+#        Default:    1
+
+Transmogrification.RequireToken = 0
+Transmogrification.TokenEntry = 49426
+Transmogrification.TokenAmount = 1
+
+#
+#    QUALITIES
+#
+#    Transmogrification.AllowPoor
+#        Description: Allow poor quality items to be used as source and target items
+#        Default:    0
+#
+#    Transmogrification.AllowCommon
+#        Description: Allow common quality items to be used as source and target items
+#        Default:    0
+#
+#    Transmogrification.AllowUncommon
+#        Description: Allow uncommon quality items to be used as source and target items
+#        Default:    1
+#
+#    Transmogrification.AllowRare
+#        Description: Allow rare quality items to be used as source and target items
+#        Default:    1
+#
+#    Transmogrification.AllowEpic
+#        Description: Allow epic quality items to be used as source and target items
+#        Default:    1
+#
+#    Transmogrification.AllowLegendary
+#        Description: Allow legendary quality items to be used as source and target items
+#        Default:    0
+#
+#    Transmogrification.AllowArtifact
+#        Description: Allow artifact quality items to be used as source and target items
+#        Default:    0
+#
+#    Transmogrification.AllowHeirloom
+#        Description: Allow heirloom quality items to be used as source and target items
+#        Default:    1
+
+Transmogrification.AllowPoor = 0
+Transmogrification.AllowCommon = 0
+Transmogrification.AllowUncommon = 1
+Transmogrification.AllowRare = 1
+Transmogrification.AllowEpic = 1
+Transmogrification.AllowLegendary = 0
+Transmogrification.AllowArtifact = 0
+Transmogrification.AllowHeirloom = 1
 
 #
 ###################################################################################################

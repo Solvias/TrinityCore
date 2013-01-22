@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -130,7 +130,6 @@ void PetAI::UpdateAI(const uint32 diff)
         }
         else
             HandleReturnMovement();
-
     }
 
     // Autocast (casted only in combat or persistent spells in any state)
@@ -252,6 +251,12 @@ void PetAI::UpdateAI(const uint32 diff)
         for (TargetSpellList::const_iterator itr = targetSpellStore.begin(); itr != targetSpellStore.end(); ++itr)
             delete itr->second;
     }
+
+    // Update speed as needed to prevent dropping too far behind and despawning
+    me->UpdateSpeed(MOVE_RUN, true);
+    me->UpdateSpeed(MOVE_WALK, true);
+    me->UpdateSpeed(MOVE_FLIGHT, true);
+
 }
 
 void PetAI::UpdateAllies()
@@ -426,9 +431,6 @@ void PetAI::HandleReturnMovement()
     {
         if (!me->GetCharmInfo()->IsAtStay() && !me->GetCharmInfo()->IsReturning())
         {
-            // Return to previous position where stay was clicked
-            if (!me->GetCharmInfo()->IsCommandAttack())
-            {
                 float x, y, z;
 
                 me->GetCharmInfo()->GetStayPosition(x, y, z);
@@ -436,20 +438,18 @@ void PetAI::HandleReturnMovement()
                 me->GetCharmInfo()->SetIsReturning(true);
                 me->GetMotionMaster()->Clear();
                 me->GetMotionMaster()->MovePoint(me->GetGUIDLow(), x, y, z);
-            }
+            
         }
     }
     else // COMMAND_FOLLOW
     {
         if (!me->GetCharmInfo()->IsFollowing() && !me->GetCharmInfo()->IsReturning())
         {
-            if (!me->GetCharmInfo()->IsCommandAttack())
-            {
                 ClearCharmInfoFlags();
                 me->GetCharmInfo()->SetIsReturning(true);
                 me->GetMotionMaster()->Clear();
                 me->GetMotionMaster()->MoveFollow(me->GetCharmerOrOwner(), PET_FOLLOW_DIST, me->GetFollowAngle());
-            }
+            
         }
     }
 }
@@ -471,9 +471,11 @@ void PetAI::DoAttack(Unit* target, bool chase)
 
         if (chase)
         {
-           ClearCharmInfoFlags();
-           me->GetMotionMaster()->Clear();
-           me->GetMotionMaster()->MoveChase(target);
+            bool oldCmdAttack = me->GetCharmInfo()->IsCommandAttack(); // This needs to be reset after other flags are cleared
+            ClearCharmInfoFlags();	
+            me->GetCharmInfo()->SetIsCommandAttack(oldCmdAttack); // For passive pets commanded to attack so they will use spells	
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveChase(target);
         }
         else // (Stay && ((Aggressive || Defensive) && In Melee Range)))
         {
@@ -597,9 +599,6 @@ void PetAI::ReceiveEmote(Player* player, uint32 emote)
                     me->HandleEmoteCommand(EMOTE_ONESHOT_OMNICAST_GHOUL);
                 break;
         }
-<<<<<<< HEAD
-}
-=======
 }
 
 void PetAI::ClearCharmInfoFlags()
@@ -637,4 +636,3 @@ void PetAI::AttackedBy(Unit* attacker)
     // Continue to evaluate and attack if necessary
     AttackStart(attacker);
 }
->>>>>>> a0239c2210a49a3b41a764d41d75098e8bb8ffeb

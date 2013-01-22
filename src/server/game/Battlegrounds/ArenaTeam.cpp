@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -337,7 +337,7 @@ void ArenaTeam::Disband(WorldSession* session)
     // Broadcast update
     if (session)
     {
-        BroadcastEvent(ERR_ARENA_TEAM_DISBANDED_S, 0, 2, session->GetPlayerName().c_str(), GetName(), "");
+        BroadcastEvent(ERR_ARENA_TEAM_DISBANDED_S, 0, 2, session->GetPlayerName(), GetName(), "");
 
         if (Player* player = session->GetPlayer())
             sLog->outDebug(LOG_FILTER_ARENAS, "Player: %s [GUID: %u] disbanded arena team type: %u [Id: %u].", player->GetName().c_str(), player->GetGUIDLow(), GetType(), GetId());
@@ -562,18 +562,19 @@ uint32 ArenaTeam::GetPoints(uint32 memberRating)
 
     if (rating <= 1500)
     {
-      points = 312 * 1.5;
+      points = 263 * 1.5;
     }
     else
       //points = 1511.26f / (1.0f + 1639.28f * exp(-0.00412f * (float)rating));
-	      points = ((float)rating * 0.3744f + 2.4f) * 1.5f;  // 1500rat => 656AP  && 2000rat => 869ap && 3100rat => 1338ap  (with all bonus)
+	      points = ((float)rating * 0.402f) * 1.5f;  // 1500rat => 656AP  && 2000rat => 869ap && 3100rat => 1338ap  (with all bonus)
 
     // Type penalties for teams < 5v5
     if (Type == ARENA_TEAM_2v2)
-        points *= 0.76f;
+        points *= 0.75f;
     else if (Type == ARENA_TEAM_3v3)
-        points *= 0.88f;
+        points *= 0.90f;
 
+		
     return (uint32) points;
 }
 

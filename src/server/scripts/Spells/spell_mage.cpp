@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -29,6 +29,10 @@
 enum MageSpells
 {
     SPELL_MAGE_COLD_SNAP                         = 11958,
+    SPELL_MAGE_FROST_WARDING_R1                  = 11189,
+    SPELL_MAGE_FROST_WARDING_TRIGGERED           = 57776,
+    SPELL_MAGE_INCANTERS_ABSORBTION_R1           = 44394,
+    SPELL_MAGE_INCANTERS_ABSORBTION_TRIGGERED    = 44413,
     SPELL_MAGE_SQUIRREL_FORM                     = 32813,
     SPELL_MAGE_GIRAFFE_FORM                      = 32816,
     SPELL_MAGE_SERPENT_FORM                      = 32817,
@@ -41,6 +45,32 @@ enum MageSpells
     SPELL_MAGE_GLYPH_OF_BLAST_WAVE               = 62126,
 };
 
+// Incanter's Absorbtion
+class spell_mage_incanters_absorbtion_base_AuraScript : public AuraScript
+{
+    public:
+        bool Validate(SpellInfo const* /*spellInfo*/)
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_MAGE_INCANTERS_ABSORBTION_TRIGGERED))
+                return false;
+            if (!sSpellMgr->GetSpellInfo(SPELL_MAGE_INCANTERS_ABSORBTION_R1))
+                return false;
+            return true;
+        }
+
+        void Trigger(AuraEffect* aurEff, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
+        {
+            Unit* target = GetTarget();
+
+            if (AuraEffect* talentAurEff = target->GetAuraEffectOfRankedSpell(SPELL_MAGE_INCANTERS_ABSORBTION_R1, EFFECT_0))
+            {
+                int32 bp = CalculatePct(absorbAmount, talentAurEff->GetAmount());
+                target->CastCustomSpell(target, SPELL_MAGE_INCANTERS_ABSORBTION_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
+            }
+        }
+};
+
+// -11113 - Blast Wave
 class spell_mage_blast_wave : public SpellScriptLoader
 {
     public:
@@ -50,7 +80,7 @@ class spell_mage_blast_wave : public SpellScriptLoader
         {
             PrepareSpellScript(spell_mage_blast_wave_SpellScript);
 
-            bool Validate(SpellInfo const* /*spellEntry*/)
+            bool Validate(SpellInfo const* /*spellInfo*/)
             {
                 if (!sSpellMgr->GetSpellInfo(SPELL_MAGE_GLYPH_OF_BLAST_WAVE))
                     return false;
@@ -75,6 +105,7 @@ class spell_mage_blast_wave : public SpellScriptLoader
         }
 };
 
+// 11958 - Cold Snap
 class spell_mage_cold_snap : public SpellScriptLoader
 {
     public:
@@ -91,7 +122,6 @@ class spell_mage_cold_snap : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-
                 Player* caster = GetCaster()->ToPlayer();
                 // immediately finishes the cooldown on Frost spells
                 const SpellCooldowns& cm = caster->GetSpellCooldownMap();
@@ -112,7 +142,6 @@ class spell_mage_cold_snap : public SpellScriptLoader
 
             void Register()
             {
-                // add dummy effect spell handler to Cold Snap
                 OnEffectHit += SpellEffectFn(spell_mage_cold_snap_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
         };
@@ -123,141 +152,47 @@ class spell_mage_cold_snap : public SpellScriptLoader
         }
 };
 
-enum SilvermoonPolymorph
-{
-    NPC_AUROSALIA   = 18744,
-};
-
-// TODO: move out of here and rename - not a mage spell
-class spell_mage_polymorph_cast_visual : public SpellScriptLoader
+// -543  - Fire Ward
+// -6143 - Frost Ward
+class spell_mage_fire_frost_ward : public SpellScriptLoader
 {
     public:
-        spell_mage_polymorph_cast_visual() : SpellScriptLoader("spell_mage_polymorph_visual") { }
+        spell_mage_fire_frost_ward() : SpellScriptLoader("spell_mage_fire_frost_ward") { }
 
-        class spell_mage_polymorph_cast_visual_SpellScript : public SpellScript
+        class spell_mage_fire_frost_ward_AuraScript : public spell_mage_incanters_absorbtion_base_AuraScript
         {
-            PrepareSpellScript(spell_mage_polymorph_cast_visual_SpellScript);
+            PrepareAuraScript(spell_mage_fire_frost_ward_AuraScript);
 
-            static const uint32 PolymorhForms[6];
-
-            bool Validate(SpellInfo const* /*spellEntry*/)
+            bool Validate(SpellInfo const* /*spellInfo*/)
             {
-                // check if spell ids exist in dbc
-                for (uint32 i = 0; i < 6; i++)
-                    if (!sSpellMgr->GetSpellInfo(PolymorhForms[i]))
-                        return false;
-                return true;
-            }
-
-            void HandleDummy(SpellEffIndex /*effIndex*/)
-            {
-                if (Unit* target = GetCaster()->FindNearestCreature(NPC_AUROSALIA, 30.0f))
-                    if (target->GetTypeId() == TYPEID_UNIT)
-                        target->CastSpell(target, PolymorhForms[urand(0, 5)], true);
-            }
-
-            void Register()
-            {
-                // add dummy effect spell handler to Polymorph visual
-                OnEffectHitTarget += SpellEffectFn(spell_mage_polymorph_cast_visual_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_mage_polymorph_cast_visual_SpellScript();
-        }
-};
-
-const uint32 spell_mage_polymorph_cast_visual::spell_mage_polymorph_cast_visual_SpellScript::PolymorhForms[6] =
-{
-    SPELL_MAGE_SQUIRREL_FORM,
-    SPELL_MAGE_GIRAFFE_FORM,
-    SPELL_MAGE_SERPENT_FORM,
-    SPELL_MAGE_DRAGONHAWK_FORM,
-    SPELL_MAGE_WORGEN_FORM,
-    SPELL_MAGE_SHEEP_FORM
-};
-
-class spell_mage_summon_water_elemental : public SpellScriptLoader
-{
-    public:
-        spell_mage_summon_water_elemental() : SpellScriptLoader("spell_mage_summon_water_elemental") { }
-
-        class spell_mage_summon_water_elemental_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_mage_summon_water_elemental_SpellScript);
-
-            bool Validate(SpellInfo const* /*spellEntry*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_MAGE_GLYPH_OF_ETERNAL_WATER) || !sSpellMgr->GetSpellInfo(SPELL_MAGE_SUMMON_WATER_ELEMENTAL_TEMPORARY) || !sSpellMgr->GetSpellInfo(SPELL_MAGE_SUMMON_WATER_ELEMENTAL_PERMANENT))
+                if (!sSpellMgr->GetSpellInfo(SPELL_MAGE_FROST_WARDING_TRIGGERED))
+                    return false;
+                if (!sSpellMgr->GetSpellInfo(SPELL_MAGE_FROST_WARDING_R1))
                     return false;
                 return true;
             }
 
-            void HandleDummy(SpellEffIndex /*effIndex*/)
+            void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
             {
-                Unit* caster = GetCaster();
-                // Glyph of Eternal Water
-                if (caster->HasAura(SPELL_MAGE_GLYPH_OF_ETERNAL_WATER))
-                    caster->CastSpell(caster, SPELL_MAGE_SUMMON_WATER_ELEMENTAL_PERMANENT, true);
-                else
-                    caster->CastSpell(caster, SPELL_MAGE_SUMMON_WATER_ELEMENTAL_TEMPORARY, true);
-            }
-            
-            SpellCastResult HandleCheckCast() {
-                Unit *caster = GetCaster();
-                if (caster->GetPetGUID())
-                    return SPELL_FAILED_ALREADY_HAVE_SUMMON;
-                if (caster->GetCharmGUID())
-                    return SPELL_FAILED_ALREADY_HAVE_CHARM;
-                
-                return SPELL_CAST_OK;
+                canBeRecalculated = false;
+                if (Unit* caster = GetCaster())
+                {
+                    // +80.68% from sp bonus
+                    float bonus = 0.8068f;
+
+                    bonus *= caster->SpellBaseHealingBonusDone(GetSpellInfo()->GetSchoolMask());
+                    bonus *= caster->CalculateLevelPenalty(GetSpellInfo());
+
+                    amount += int32(bonus);
+                }
             }
 
-            void Register()
-            {
-                // add dummy effect spell handler to Summon Water Elemental
-                OnEffectHit += SpellEffectFn(spell_mage_summon_water_elemental_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-                OnCheckCast += SpellCheckCastFn(spell_mage_summon_water_elemental_SpellScript::HandleCheckCast);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_mage_summon_water_elemental_SpellScript();
-        }
-};
-
-// Frost Warding
-class spell_mage_frost_warding_trigger : public SpellScriptLoader
-{
-    public:
-        spell_mage_frost_warding_trigger() : SpellScriptLoader("spell_mage_frost_warding_trigger") { }
-
-        class spell_mage_frost_warding_trigger_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_mage_frost_warding_trigger_AuraScript);
-
-            enum Spells
-            {
-                SPELL_MAGE_FROST_WARDING_TRIGGERED = 57776,
-                SPELL_MAGE_FROST_WARDING_R1 = 28332,
-            };
-
-            bool Validate(SpellInfo const* /*spellEntry*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_MAGE_FROST_WARDING_TRIGGERED) || !sSpellMgr->GetSpellInfo(SPELL_MAGE_FROST_WARDING_R1))
-                    return false;
-                return true;
-            }
-
-            void Absorb(AuraEffect* aurEff, DamageInfo & dmgInfo, uint32 & absorbAmount)
+            void Absorb(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
             {
                 Unit* target = GetTarget();
                 if (AuraEffect* talentAurEff = target->GetAuraEffectOfRankedSpell(SPELL_MAGE_FROST_WARDING_R1, EFFECT_0))
                 {
-                    int32 chance = talentAurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+                    int32 chance = talentAurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue(); // SPELL_EFFECT_DUMMY with NO_TARGET
 
                     if (roll_chance_i(chance))
                     {
@@ -272,87 +207,62 @@ class spell_mage_frost_warding_trigger : public SpellScriptLoader
 
             void Register()
             {
-                 OnEffectAbsorb += AuraEffectAbsorbFn(spell_mage_frost_warding_trigger_AuraScript::Absorb, EFFECT_0);
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_fire_frost_ward_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+                OnEffectAbsorb += AuraEffectAbsorbFn(spell_mage_fire_frost_ward_AuraScript::Absorb, EFFECT_0);
+                AfterEffectAbsorb += AuraEffectAbsorbFn(spell_mage_fire_frost_ward_AuraScript::Trigger, EFFECT_0);
             }
         };
 
         AuraScript* GetAuraScript() const
         {
-            return new spell_mage_frost_warding_trigger_AuraScript();
+            return new spell_mage_fire_frost_ward_AuraScript();
         }
 };
 
-class spell_mage_incanters_absorbtion_base_AuraScript : public AuraScript
+// -11426 - Ice Barrier
+class spell_mage_ice_barrier : public SpellScriptLoader
 {
     public:
-        enum Spells
+        spell_mage_ice_barrier() : SpellScriptLoader("spell_mage_ice_barrier") { }
+
+        class spell_mage_ice_barrier_AuraScript : public spell_mage_incanters_absorbtion_base_AuraScript
         {
-            SPELL_MAGE_INCANTERS_ABSORBTION_TRIGGERED = 44413,
-            SPELL_MAGE_INCANTERS_ABSORBTION_R1 = 44394,
+            PrepareAuraScript(spell_mage_ice_barrier_AuraScript);
+
+            void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
+            {
+                canBeRecalculated = false;
+                if (Unit* caster = GetCaster())
+                {
+                    // +80.68% from sp bonus
+                    float bonus = 0.8068f;
+
+                    bonus *= caster->SpellBaseHealingBonusDone(GetSpellInfo()->GetSchoolMask());
+
+                    // Glyph of Ice Barrier: its weird having a SPELLMOD_ALL_EFFECTS here but its blizzards doing :)
+                    // Glyph of Ice Barrier is only applied at the spell damage bonus because it was already applied to the base value in CalculateSpellDamage
+                    bonus = caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), bonus);
+
+                    bonus *= caster->CalculateLevelPenalty(GetSpellInfo());
+
+                    amount += int32(bonus);
+                }
+            }
+
+            void Register()
+            {
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_ice_barrier_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+                AfterEffectAbsorb += AuraEffectAbsorbFn(spell_mage_ice_barrier_AuraScript::Trigger, EFFECT_0);
+            }
         };
 
-        bool Validate(SpellInfo const* /*spellEntry*/)
+        AuraScript* GetAuraScript() const
         {
-            return sSpellMgr->GetSpellInfo(SPELL_MAGE_INCANTERS_ABSORBTION_TRIGGERED)
-                && sSpellMgr->GetSpellInfo(SPELL_MAGE_INCANTERS_ABSORBTION_R1);
-        }
-
-        void Trigger(AuraEffect* aurEff, DamageInfo & /*dmgInfo*/, uint32 & absorbAmount)
-        {
-            Unit* target = GetTarget();
-
-            if (AuraEffect* talentAurEff = target->GetAuraEffectOfRankedSpell(SPELL_MAGE_INCANTERS_ABSORBTION_R1, EFFECT_0))
-            {
-                int32 bp = CalculatePct(absorbAmount, talentAurEff->GetAmount());
-                target->CastCustomSpell(target, SPELL_MAGE_INCANTERS_ABSORBTION_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
-            }
+            return new spell_mage_ice_barrier_AuraScript();
         }
 };
 
-// Incanter's Absorption
-class spell_mage_incanters_absorbtion_absorb : public SpellScriptLoader
-{
-public:
-    spell_mage_incanters_absorbtion_absorb() : SpellScriptLoader("spell_mage_incanters_absorbtion_absorb") { }
-
-    class spell_mage_incanters_absorbtion_absorb_AuraScript : public spell_mage_incanters_absorbtion_base_AuraScript
-    {
-        PrepareAuraScript(spell_mage_incanters_absorbtion_absorb_AuraScript);
-
-        void Register()
-        {
-             AfterEffectAbsorb += AuraEffectAbsorbFn(spell_mage_incanters_absorbtion_absorb_AuraScript::Trigger, EFFECT_0);
-        }
-    };
-
-    AuraScript* GetAuraScript() const
-    {
-        return new spell_mage_incanters_absorbtion_absorb_AuraScript();
-    }
-};
-
-// Incanter's Absorption
-class spell_mage_incanters_absorbtion_manashield : public SpellScriptLoader
-{
-public:
-    spell_mage_incanters_absorbtion_manashield() : SpellScriptLoader("spell_mage_incanters_absorbtion_manashield") { }
-
-    class spell_mage_incanters_absorbtion_manashield_AuraScript : public spell_mage_incanters_absorbtion_base_AuraScript
-    {
-        PrepareAuraScript(spell_mage_incanters_absorbtion_manashield_AuraScript);
-
-        void Register()
-        {
-             AfterEffectManaShield += AuraEffectManaShieldFn(spell_mage_incanters_absorbtion_manashield_AuraScript::Trigger, EFFECT_0);
-        }
-    };
-
-    AuraScript* GetAuraScript() const
-    {
-        return new spell_mage_incanters_absorbtion_manashield_AuraScript();
-    }
-};
-
+// -44457 - Living Bomb
 class spell_mage_living_bomb : public SpellScriptLoader
 {
     public:
@@ -391,14 +301,147 @@ class spell_mage_living_bomb : public SpellScriptLoader
         }
 };
 
+// -1463 - Mana Shield
+class spell_mage_mana_shield : public SpellScriptLoader
+{
+    public:
+        spell_mage_mana_shield() : SpellScriptLoader("spell_mage_mana_shield") { }
+
+        class spell_mage_mana_shield_AuraScript : public spell_mage_incanters_absorbtion_base_AuraScript
+        {
+            PrepareAuraScript(spell_mage_mana_shield_AuraScript);
+
+            void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
+            {
+                canBeRecalculated = false;
+                if (Unit* caster = GetCaster())
+                {
+                    // +80.53% from sp bonus
+                    float bonus = 0.8053f;
+
+                    bonus *= caster->SpellBaseHealingBonusDone(GetSpellInfo()->GetSchoolMask());
+                    bonus *= caster->CalculateLevelPenalty(GetSpellInfo());
+
+                    amount += int32(bonus);
+                }
+            }
+
+            void Register()
+            {
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_mana_shield_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_MANA_SHIELD);
+                AfterEffectManaShield += AuraEffectManaShieldFn(spell_mage_mana_shield_AuraScript::Trigger, EFFECT_0);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_mage_mana_shield_AuraScript();
+        }
+};
+
+enum SilvermoonPolymorph
+{
+    NPC_AUROSALIA   = 18744,
+};
+
+// TODO: move out of here and rename - not a mage spell
+// 32826 - Polymorph (Visual)
+class spell_mage_polymorph_cast_visual : public SpellScriptLoader
+{
+    public:
+        spell_mage_polymorph_cast_visual() : SpellScriptLoader("spell_mage_polymorph_visual") { }
+
+        class spell_mage_polymorph_cast_visual_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_mage_polymorph_cast_visual_SpellScript);
+
+            static const uint32 PolymorhForms[6];
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                // check if spell ids exist in dbc
+                for (uint32 i = 0; i < 6; ++i)
+                    if (!sSpellMgr->GetSpellInfo(PolymorhForms[i]))
+                        return false;
+                return true;
+            }
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                if (Unit* target = GetCaster()->FindNearestCreature(NPC_AUROSALIA, 30.0f))
+                    if (target->GetTypeId() == TYPEID_UNIT)
+                        target->CastSpell(target, PolymorhForms[urand(0, 5)], true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_mage_polymorph_cast_visual_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_mage_polymorph_cast_visual_SpellScript();
+        }
+};
+
+const uint32 spell_mage_polymorph_cast_visual::spell_mage_polymorph_cast_visual_SpellScript::PolymorhForms[6] =
+{
+    SPELL_MAGE_SQUIRREL_FORM,
+    SPELL_MAGE_GIRAFFE_FORM,
+    SPELL_MAGE_SERPENT_FORM,
+    SPELL_MAGE_DRAGONHAWK_FORM,
+    SPELL_MAGE_WORGEN_FORM,
+    SPELL_MAGE_SHEEP_FORM
+};
+
+// 31687 - Summon Water Elemental
+class spell_mage_summon_water_elemental : public SpellScriptLoader
+{
+    public:
+        spell_mage_summon_water_elemental() : SpellScriptLoader("spell_mage_summon_water_elemental") { }
+
+        class spell_mage_summon_water_elemental_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_mage_summon_water_elemental_SpellScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_MAGE_GLYPH_OF_ETERNAL_WATER) || !sSpellMgr->GetSpellInfo(SPELL_MAGE_SUMMON_WATER_ELEMENTAL_TEMPORARY) || !sSpellMgr->GetSpellInfo(SPELL_MAGE_SUMMON_WATER_ELEMENTAL_PERMANENT))
+                    return false;
+                return true;
+            }
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                Unit* caster = GetCaster();
+                // Glyph of Eternal Water
+                if (caster->HasAura(SPELL_MAGE_GLYPH_OF_ETERNAL_WATER))
+                    caster->CastSpell(caster, SPELL_MAGE_SUMMON_WATER_ELEMENTAL_PERMANENT, true);
+                else
+                    caster->CastSpell(caster, SPELL_MAGE_SUMMON_WATER_ELEMENTAL_TEMPORARY, true);
+            }
+
+            void Register()
+            {
+                OnEffectHit += SpellEffectFn(spell_mage_summon_water_elemental_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_mage_summon_water_elemental_SpellScript();
+        }
+};
+
 void AddSC_mage_spell_scripts()
 {
     new spell_mage_blast_wave();
     new spell_mage_cold_snap();
-    new spell_mage_frost_warding_trigger();
-    new spell_mage_incanters_absorbtion_absorb();
-    new spell_mage_incanters_absorbtion_manashield();
+    new spell_mage_fire_frost_ward();
+    new spell_mage_ice_barrier();
+    new spell_mage_living_bomb();
+    new spell_mage_mana_shield();
     new spell_mage_polymorph_cast_visual();
     new spell_mage_summon_water_elemental();
-    new spell_mage_living_bomb();
 }

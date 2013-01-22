@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -862,7 +862,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recvData)
         // rotate the players position instead of rotating the whole cube, that way we can make a simplified
         // is-in-cube check and we have to calculate only one point instead of 4
 
-        // 2PI = 360Â°, keep in mind that ingame orientation is counter-clockwise
+        // 2PI = 360°, keep in mind that ingame orientation is counter-clockwise
         double rotation = 2 * M_PI - atEntry->box_orientation;
         double sinVal = std::sin(rotation);
         double cosVal = std::cos(rotation);
@@ -1684,7 +1684,7 @@ void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket& recvData)
         sBattlegroundMgr->SendAreaSpiritHealerQueryOpcode(_player, bg, guid);
 
     if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(_player->GetZoneId()))
-        bf->SendAreaSpiritHealerQueryOpcode(_player,guid);
+        bf->SendAreaSpiritHealerQueryOpcode(_player, guid);
 }
 
 void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPacket& recvData)

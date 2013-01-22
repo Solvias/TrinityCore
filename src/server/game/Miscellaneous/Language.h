@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -531,7 +531,7 @@ enum TrinityStrings
     LANG_NPC_SETDATA                    = 555,
 
     //! Old ones now free:
-    // LANG_HOVER_DISABLED              = 556,
+    LANG_COMMAND_NEAR_NPC_MESSAGE       = 556,
 
     LANG_YOURS_LEVEL_UP                 = 557,
     LANG_YOURS_LEVEL_DOWN               = 558,
@@ -742,7 +742,32 @@ enum TrinityStrings
     LANG_COMMAND_CREATURESTORAGE_NOTFOUND  = 818,
 
     LANG_CHANNEL_CITY                   = 819,
-    // Room for in-game strings           820-999 not used
+
+    LANG_NPCINFO_GOSSIP                 = 820,
+    LANG_NPCINFO_QUESTGIVER             = 821,
+    LANG_NPCINFO_TRAINER_CLASS          = 822,
+    LANG_NPCINFO_TRAINER_PROFESSION     = 823,
+    LANG_NPCINFO_VENDOR_AMMO            = 824,
+    LANG_NPCINFO_VENDOR_FOOD            = 825,
+    LANG_NPCINFO_VENDOR_POISON          = 826,
+    LANG_NPCINFO_VENDOR_REAGENT         = 827,
+    LANG_NPCINFO_REPAIR                 = 828,
+    LANG_NPCINFO_FLIGHTMASTER           = 829,
+    LANG_NPCINFO_SPIRITHEALER           = 830,
+    LANG_NPCINFO_SPIRITGUIDE            = 831,
+    LANG_NPCINFO_INNKEEPER              = 832,
+    LANG_NPCINFO_BANKER                 = 833,
+    LANG_NPCINFO_PETITIONER             = 834,
+    LANG_NPCINFO_TABARDDESIGNER         = 835,
+    LANG_NPCINFO_BATTLEMASTER           = 836,
+    LANG_NPCINFO_AUCTIONEER             = 837,
+    LANG_NPCINFO_STABLEMASTER           = 838,
+    LANG_NPCINFO_GUILD_BANKER           = 839,
+    LANG_NPCINFO_SPELLCLICK             = 840,
+    LANG_NPCINFO_MAILBOX                = 841,
+    LANG_NPCINFO_PLAYER_VEHICLE         = 842,
+
+    // Room for in-game strings           843-999 not used
 
     // Level 4 (CLI only commands)
     LANG_COMMAND_EXIT                   = 1000,
@@ -928,6 +953,7 @@ enum TrinityStrings
     LANG_COMMAND_TICKETSHOWESCALATEDLIST = 2026,
     LANG_COMMAND_TICKETPENDING          = 2027,
     LANG_COMMAND_TICKETRESET            = 2028,
+    LANG_COMMAND_TICKETLISTRESPONSE     = 2029,
 
     // Trinity strings                    5000-9999
     LANG_COMMAND_FREEZE                 = 5000,
@@ -966,7 +992,8 @@ enum TrinityStrings
     LANG_COMMAND_NO_BATTLEGROUND_FOUND  = 5032,
     LANG_COMMAND_NO_ACHIEVEMENT_CRITERIA_FOUND = 5033,
     LANG_COMMAND_NO_OUTDOOR_PVP_FORUND  = 5034,
-    // Room for more Trinity strings      5035-9999
+    LANG_CALL_FOR_HELP                  = 5035,
+    // Room for more Trinity strings      5036-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,

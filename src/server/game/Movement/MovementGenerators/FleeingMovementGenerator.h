@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -27,16 +27,12 @@ class FleeingMovementGenerator : public MovementGeneratorMedium< T, FleeingMovem
     public:
         FleeingMovementGenerator(uint64 fright) : i_frightGUID(fright), i_nextCheckTime(0) {}
  
-        void Initialize(T*);
-        void Finalize(T*);
-        void Reset(T*);
-<<<<<<< HEAD
-        bool Update(T*, const uint32 &);
- 
-=======
-        bool Update(T*, uint32);
 
->>>>>>> a0239c2210a49a3b41a764d41d75098e8bb8ffeb
+        void DoInitialize(T*);
+        void DoFinalize(T*);
+        void DoReset(T*);
+        bool DoUpdate(T*, uint32);
+
         MovementGeneratorType GetMovementGeneratorType() { return FLEEING_MOTION_TYPE; }
  
     private:
@@ -67,8 +63,8 @@ class TimedFleeingMovementGenerator : public FleeingMovementGenerator<Creature>
             i_totalFleeTime(time) {}
  
         MovementGeneratorType GetMovementGeneratorType() { return TIMED_FLEEING_MOTION_TYPE; }
-        bool Update(Unit*, uint32);
-        void Finalize(Unit*);
+        bool DoUpdate(Unit*, uint32);
+        void DoFinalize(Unit*);
  
     private:
         TimeTracker i_totalFleeTime;

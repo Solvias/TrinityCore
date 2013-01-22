@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -71,6 +71,93 @@ class spell_item_trigger_spell : public SpellScriptLoader
         {
             return new spell_item_trigger_spell_SpellScript(_triggeredSpellId);
         }
+};
+
+// 26400 - Arcane Shroud
+class spell_item_arcane_shroud : public SpellScriptLoader
+{
+    public:
+        spell_item_arcane_shroud() : SpellScriptLoader("spell_item_arcane_shroud") { }
+
+        class spell_item_arcane_shroud_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_item_arcane_shroud_AuraScript);
+
+            void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+            {
+                int32 diff = GetUnitOwner()->getLevel() - 60;
+                if (diff > 0)
+                    amount += 2 * diff;
+            }
+
+            void Register()
+            {
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_item_arcane_shroud_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_THREAT);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_item_arcane_shroud_AuraScript();
+        }
+};
+
+// 8342  - Defibrillate (Goblin Jumper Cables) have 33% chance on success
+// 22999 - Defibrillate (Goblin Jumper Cables XL) have 50% chance on success
+// 54732 - Defibrillate (Gnomish Army Knife) have 67% chance on success
+enum Defibrillate
+{
+    SPELL_GOBLIN_JUMPER_CABLES_FAIL     = 8338,
+    SPELL_GOBLIN_JUMPER_CABLES_XL_FAIL  = 23055
+};
+
+class spell_item_defibrillate : public SpellScriptLoader
+{
+    public:
+        spell_item_defibrillate(char const* name, uint8 chance, uint32 failSpell = 0) : SpellScriptLoader(name), _chance(chance), _failSpell(failSpell) { }
+
+        class spell_item_defibrillate_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_item_defibrillate_SpellScript);
+
+        public:
+            spell_item_defibrillate_SpellScript(uint8 chance, uint32 failSpell) : SpellScript(), _chance(chance), _failSpell(failSpell) { }
+
+            bool Validate(SpellInfo const* /*spellInfo*/)
+            {
+                if (_failSpell && !sSpellMgr->GetSpellInfo(_failSpell))
+                    return false;
+                return true;
+            }
+
+            void HandleScript(SpellEffIndex effIndex)
+            {
+                if (roll_chance_i(_chance))
+                {
+                    PreventHitDefaultEffect(effIndex);
+                    if (_failSpell)
+                        GetCaster()->CastSpell(GetCaster(), _failSpell, true, GetCastItem());
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_item_defibrillate_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_RESURRECT);
+            }
+
+        private:
+            uint8 _chance;
+            uint32 _failSpell;
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_item_defibrillate_SpellScript(_chance, _failSpell);
+        }
+
+    private:
+        uint8 _chance;
+        uint32 _failSpell;
 };
 
 // http://www.wowhead.com/item=6522 Deviate Fish
@@ -464,6 +551,35 @@ class spell_item_noggenfogger_elixir : public SpellScriptLoader
         }
 };
 
+// 17512 - Piccolo of the Flaming Fire
+class spell_item_piccolo_of_the_flaming_fire : public SpellScriptLoader
+{
+    public:
+        spell_item_piccolo_of_the_flaming_fire() : SpellScriptLoader("spell_item_piccolo_of_the_flaming_fire") { }
+
+        class spell_item_piccolo_of_the_flaming_fire_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_item_piccolo_of_the_flaming_fire_SpellScript);
+
+            void HandleScript(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+                if (Player* target = GetHitPlayer())
+                    target->HandleEmoteCommand(EMOTE_STATE_DANCE);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_item_piccolo_of_the_flaming_fire_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_item_piccolo_of_the_flaming_fire_SpellScript();
+        }
+};
+
 // http://www.wowhead.com/item=6657 Savory Deviate Delight
 // 8213 Savory Deviate Delight
 enum SavoryDeviateDelight
@@ -519,6 +635,79 @@ class spell_item_savory_deviate_delight : public SpellScriptLoader
         SpellScript* GetSpellScript() const
         {
             return new spell_item_savory_deviate_delight_SpellScript();
+        }
+};
+
+// 48129 - Scroll of Recall
+// 60320 - Scroll of Recall II
+// 60321 - Scroll of Recall III
+enum ScrollOfRecall
+{
+    SPELL_SCROLL_OF_RECALL_I                = 48129,
+    SPELL_SCROLL_OF_RECALL_II               = 60320,
+    SPELL_SCROLL_OF_RECALL_III              = 60321,
+    SPELL_LOST                              = 60444,
+    SPELL_SCROLL_OF_RECALL_FAIL_ALLIANCE_1  = 60323,
+    SPELL_SCROLL_OF_RECALL_FAIL_HORDE_1     = 60328,
+};
+
+class spell_item_scroll_of_recall : public SpellScriptLoader
+{
+    public:
+        spell_item_scroll_of_recall() : SpellScriptLoader("spell_item_scroll_of_recall") { }
+
+        class spell_item_scroll_of_recall_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_item_scroll_of_recall_SpellScript);
+
+            bool Load()
+            {
+                return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+            }
+
+            void HandleScript(SpellEffIndex effIndex)
+            {
+                Unit* caster = GetCaster();
+                uint8 maxSafeLevel = 0;
+                switch (GetSpellInfo()->Id)
+                {
+                    case SPELL_SCROLL_OF_RECALL_I:  // Scroll of Recall
+                        maxSafeLevel = 40;
+                        break;
+                    case SPELL_SCROLL_OF_RECALL_II:  // Scroll of Recall II
+                        maxSafeLevel = 70;
+                        break;
+                    case SPELL_SCROLL_OF_RECALL_III:  // Scroll of Recal III
+                        maxSafeLevel = 80;
+                        break;
+                    default:
+                        break;
+                }
+
+                if (caster->getLevel() > maxSafeLevel)
+                {
+                    caster->CastSpell(caster, SPELL_LOST, true);
+
+                    // ALLIANCE from 60323 to 60330 - HORDE from 60328 to 60335
+                    uint32 spellId = SPELL_SCROLL_OF_RECALL_FAIL_ALLIANCE_1;
+                    if (GetCaster()->ToPlayer()->GetTeam() == HORDE)
+                        spellId = SPELL_SCROLL_OF_RECALL_FAIL_HORDE_1;
+
+                    GetCaster()->CastSpell(GetCaster(), spellId + urand(0, 7), true);
+
+                    PreventHitDefaultEffect(effIndex);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_item_scroll_of_recall_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_TELEPORT_UNITS);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_item_scroll_of_recall_SpellScript();
         }
 };
 
@@ -590,6 +779,35 @@ class spell_item_six_demon_bag : public SpellScriptLoader
         SpellScript* GetSpellScript() const
         {
             return new spell_item_six_demon_bag_SpellScript();
+        }
+};
+
+// 28862 - The Eye of Diminution
+class spell_item_the_eye_of_diminution : public SpellScriptLoader
+{
+    public:
+        spell_item_the_eye_of_diminution() : SpellScriptLoader("spell_item_the_eye_of_diminution") { }
+
+        class spell_item_the_eye_of_diminution_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_item_the_eye_of_diminution_AuraScript);
+
+            void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+            {
+                int32 diff = GetUnitOwner()->getLevel() - 60;
+                if (diff > 0)
+                    amount += diff;
+            }
+
+            void Register()
+            {
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_item_the_eye_of_diminution_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_THREAT);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_item_the_eye_of_diminution_AuraScript();
         }
 };
 
@@ -1350,7 +1568,7 @@ class spell_item_poultryizer : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /* effIndex */)
             {
                 if (GetCastItem() && GetHitUnit())
-                    GetCaster()->CastSpell(GetHitUnit(), roll_chance_i(80) ? SPELL_POULTRYIZER_SUCCESS : SPELL_POULTRYIZER_BACKFIRE , true, GetCastItem());
+                    GetCaster()->CastSpell(GetHitUnit(), roll_chance_i(80) ? SPELL_POULTRYIZER_SUCCESS : SPELL_POULTRYIZER_BACKFIRE, true, GetCastItem());
             }
 
             void Register()
@@ -1710,7 +1928,7 @@ class spell_item_teach_language : public SpellScriptLoader
                 Player* caster = GetCaster()->ToPlayer();
 
                 if (roll_chance_i(34))
-                    caster->CastSpell(caster,caster->GetTeam() == ALLIANCE ? SPELL_LEARN_GNOMISH_BINARY : SPELL_LEARN_GOBLIN_BINARY, true);
+                    caster->CastSpell(caster, caster->GetTeam() == ALLIANCE ? SPELL_LEARN_GNOMISH_BINARY : SPELL_LEARN_GOBLIN_BINARY, true);
             }
 
             void Register()
@@ -2004,7 +2222,7 @@ public:
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             if (GetHitUnit())
-                GetCaster()->CastSpell(GetCaster(),SPELL_FORCE_CAST_SUMMON_GNOME_SOUL);
+                GetCaster()->CastSpell(GetCaster(), SPELL_FORCE_CAST_SUMMON_GNOME_SOUL);
         }
 
         void Register()
@@ -2030,6 +2248,10 @@ void AddSC_item_spell_scripts()
     // 23075 Mithril Mechanical Dragonling
     new spell_item_trigger_spell("spell_item_mithril_mechanical_dragonling", SPELL_MITHRIL_MECHANICAL_DRAGONLING);
 
+    new spell_item_arcane_shroud();
+    new spell_item_defibrillate("spell_item_goblin_jumper_cables", 67, SPELL_GOBLIN_JUMPER_CABLES_FAIL);
+    new spell_item_defibrillate("spell_item_goblin_jumper_cables_xl", 50, SPELL_GOBLIN_JUMPER_CABLES_XL_FAIL);
+    new spell_item_defibrillate("spell_item_gnomish_army_knife", 33);
     new spell_item_deviate_fish();
     new spell_item_flask_of_the_north();
     new spell_item_gnomish_death_ray();
@@ -2037,8 +2259,11 @@ void AddSC_item_spell_scripts()
     new spell_item_mingos_fortune_generator();
     new spell_item_net_o_matic();
     new spell_item_noggenfogger_elixir();
+    new spell_item_piccolo_of_the_flaming_fire();
     new spell_item_savory_deviate_delight();
+    new spell_item_scroll_of_recall();
     new spell_item_six_demon_bag();
+    new spell_item_the_eye_of_diminution();
     new spell_item_underbelly_elixir();
     new spell_item_shadowmourne();
     new spell_item_red_rider_air_rifle();

@@ -1,4 +1,4 @@
-# Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+# Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -11,10 +11,12 @@
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
   Custom/vendor.cpp
-  Custom/npc_transmogrify.cpp
   Custom/utility.cpp
   Custom/npc_supporter.cpp
   Custom/guru_event.cpp
+  Custom/Transmogrification.h
+
+  Custom/Transmogrification.cpp
 )
 
 message("  -> Prepared: Custom")
